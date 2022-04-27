@@ -4,15 +4,13 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"github.com/google/uuid"
-
 	"github.com/NpoolPlatform/stock-manager/pkg/db/mixin"
+	"github.com/google/uuid"
 )
 
 // Stock holds the schema definition for the Stock entity.
 type Stock struct {
 	ent.Schema
-	mixin.TimeMixin
 }
 
 func (Stock) Mixin() []ent.Mixin {
