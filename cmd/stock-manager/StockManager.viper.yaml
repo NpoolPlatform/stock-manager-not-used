@@ -1,0 +1,10 @@
+---
+config:
+  hostname: "stock-manager.npool.top"
+  http_port: 50210
+  grpc_port: 50210
+  healthz_port: 50210
+  appid: "89089012783789789719823798127398"
+  serviceid: "8ab68338-c5d6-11ec-b9c9-361644556ed1"
+  logdir: "./"
+  apolloAccessKey: "0147fb70b815403790e8634b899fac07"

@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"entgo.io/ent"
-	"github.com/NpoolPlatform/go-service-app-template/pkg/db/ent/predicate"
+	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/predicate"
 )
 
 const (
@@ -21,32 +21,32 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeEmpty = "Empty"
+	TypeStock = "Stock"
 )
 
-// EmptyMutation represents an operation that mutates the Empty nodes in the graph.
-type EmptyMutation struct {
+// StockMutation represents an operation that mutates the Stock nodes in the graph.
+type StockMutation struct {
 	config
 	op            Op
 	typ           string
 	id            *int
 	clearedFields map[string]struct{}
 	done          bool
-	oldValue      func(context.Context) (*Empty, error)
-	predicates    []predicate.Empty
+	oldValue      func(context.Context) (*Stock, error)
+	predicates    []predicate.Stock
 }
 
-var _ ent.Mutation = (*EmptyMutation)(nil)
+var _ ent.Mutation = (*StockMutation)(nil)
 
-// emptyOption allows management of the mutation configuration using functional options.
-type emptyOption func(*EmptyMutation)
+// stockOption allows management of the mutation configuration using functional options.
+type stockOption func(*StockMutation)
 
-// newEmptyMutation creates new mutation for the Empty entity.
-func newEmptyMutation(c config, op Op, opts ...emptyOption) *EmptyMutation {
-	m := &EmptyMutation{
+// newStockMutation creates new mutation for the Stock entity.
+func newStockMutation(c config, op Op, opts ...stockOption) *StockMutation {
+	m := &StockMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeEmpty,
+		typ:           TypeStock,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -55,20 +55,20 @@ func newEmptyMutation(c config, op Op, opts ...emptyOption) *EmptyMutation {
 	return m
 }
 
-// withEmptyID sets the ID field of the mutation.
-func withEmptyID(id int) emptyOption {
-	return func(m *EmptyMutation) {
+// withStockID sets the ID field of the mutation.
+func withStockID(id int) stockOption {
+	return func(m *StockMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Empty
+			value *Stock
 		)
-		m.oldValue = func(ctx context.Context) (*Empty, error) {
+		m.oldValue = func(ctx context.Context) (*Stock, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Empty.Get(ctx, id)
+					value, err = m.Client().Stock.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -77,10 +77,10 @@ func withEmptyID(id int) emptyOption {
 	}
 }
 
-// withEmpty sets the old Empty of the mutation.
-func withEmpty(node *Empty) emptyOption {
-	return func(m *EmptyMutation) {
-		m.oldValue = func(context.Context) (*Empty, error) {
+// withStock sets the old Stock of the mutation.
+func withStock(node *Stock) stockOption {
+	return func(m *StockMutation) {
+		m.oldValue = func(context.Context) (*Stock, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -89,7 +89,7 @@ func withEmpty(node *Empty) emptyOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m EmptyMutation) Client() *Client {
+func (m StockMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -97,7 +97,7 @@ func (m EmptyMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m EmptyMutation) Tx() (*Tx, error) {
+func (m StockMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -108,7 +108,7 @@ func (m EmptyMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *EmptyMutation) ID() (id int, exists bool) {
+func (m *StockMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -119,7 +119,7 @@ func (m *EmptyMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *EmptyMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *StockMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -128,31 +128,31 @@ func (m *EmptyMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Empty.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Stock.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// Where appends a list predicates to the EmptyMutation builder.
-func (m *EmptyMutation) Where(ps ...predicate.Empty) {
+// Where appends a list predicates to the StockMutation builder.
+func (m *StockMutation) Where(ps ...predicate.Stock) {
 	m.predicates = append(m.predicates, ps...)
 }
 
 // Op returns the operation name.
-func (m *EmptyMutation) Op() Op {
+func (m *StockMutation) Op() Op {
 	return m.op
 }
 
-// Type returns the node type of this mutation (Empty).
-func (m *EmptyMutation) Type() string {
+// Type returns the node type of this mutation (Stock).
+func (m *StockMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *EmptyMutation) Fields() []string {
+func (m *StockMutation) Fields() []string {
 	fields := make([]string, 0, 0)
 	return fields
 }
@@ -160,115 +160,115 @@ func (m *EmptyMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *EmptyMutation) Field(name string) (ent.Value, bool) {
+func (m *StockMutation) Field(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *EmptyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, fmt.Errorf("unknown Empty field %s", name)
+func (m *StockMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, fmt.Errorf("unknown Stock field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EmptyMutation) SetField(name string, value ent.Value) error {
+func (m *StockMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown Empty field %s", name)
+	return fmt.Errorf("unknown Stock field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *EmptyMutation) AddedFields() []string {
+func (m *StockMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *EmptyMutation) AddedField(name string) (ent.Value, bool) {
+func (m *StockMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *EmptyMutation) AddField(name string, value ent.Value) error {
-	return fmt.Errorf("unknown Empty numeric field %s", name)
+func (m *StockMutation) AddField(name string, value ent.Value) error {
+	return fmt.Errorf("unknown Stock numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *EmptyMutation) ClearedFields() []string {
+func (m *StockMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *EmptyMutation) FieldCleared(name string) bool {
+func (m *StockMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *EmptyMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Empty nullable field %s", name)
+func (m *StockMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Stock nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *EmptyMutation) ResetField(name string) error {
-	return fmt.Errorf("unknown Empty field %s", name)
+func (m *StockMutation) ResetField(name string) error {
+	return fmt.Errorf("unknown Stock field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *EmptyMutation) AddedEdges() []string {
+func (m *StockMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *EmptyMutation) AddedIDs(name string) []ent.Value {
+func (m *StockMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *EmptyMutation) RemovedEdges() []string {
+func (m *StockMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *EmptyMutation) RemovedIDs(name string) []ent.Value {
+func (m *StockMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *EmptyMutation) ClearedEdges() []string {
+func (m *StockMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *EmptyMutation) EdgeCleared(name string) bool {
+func (m *StockMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *EmptyMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown Empty unique edge %s", name)
+func (m *StockMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Stock unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *EmptyMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown Empty edge %s", name)
+func (m *StockMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Stock edge %s", name)
 }

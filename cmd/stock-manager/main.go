@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	servicename "github.com/NpoolPlatform/go-service-app-template/pkg/service-name"
+	servicename "github.com/NpoolPlatform/stock-manager/pkg/service-name"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/app"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -21,7 +21,7 @@ func main() {
 		runCmd,
 	}
 
-	description := fmt.Sprintf("my %v service cli\nFor help on any individual command run <%v COMMAND -h>\n",
+	description := fmt.Sprintf("%v service cli\nFor help on any individual command run <%v COMMAND -h>\n",
 		servicename.ServiceName, servicename.ServiceName)
 	err := app.Init(
 		servicename.ServiceName,

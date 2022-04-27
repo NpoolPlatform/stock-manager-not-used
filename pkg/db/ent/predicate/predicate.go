@@ -6,5 +6,5 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Empty is the predicate function for empty builders.
-type Empty func(*sql.Selector)
+// Stock is the predicate function for stock builders.
+type Stock func(*sql.Selector)
