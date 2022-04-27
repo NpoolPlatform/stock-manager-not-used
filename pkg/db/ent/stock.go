@@ -16,6 +16,12 @@ type Stock struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt uint32 `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt uint32 `json:"updated_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt uint32 `json:"deleted_at,omitempty"`
 	// GoodID holds the value of the "good_id" field.
 	GoodID uuid.UUID `json:"good_id,omitempty"`
 	// Total holds the value of the "total" field.
@@ -31,7 +37,7 @@ func (*Stock) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case stock.FieldTotal, stock.FieldInService, stock.FieldSold:
+		case stock.FieldCreatedAt, stock.FieldUpdatedAt, stock.FieldDeletedAt, stock.FieldTotal, stock.FieldInService, stock.FieldSold:
 			values[i] = new(sql.NullInt64)
 		case stock.FieldID, stock.FieldGoodID:
 			values[i] = new(uuid.UUID)
@@ -55,6 +61,24 @@ func (s *Stock) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				s.ID = *value
+			}
+		case stock.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				s.CreatedAt = uint32(value.Int64)
+			}
+		case stock.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				s.UpdatedAt = uint32(value.Int64)
+			}
+		case stock.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				s.DeletedAt = uint32(value.Int64)
 			}
 		case stock.FieldGoodID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -108,6 +132,12 @@ func (s *Stock) String() string {
 	var builder strings.Builder
 	builder.WriteString("Stock(")
 	builder.WriteString(fmt.Sprintf("id=%v", s.ID))
+	builder.WriteString(", created_at=")
+	builder.WriteString(fmt.Sprintf("%v", s.CreatedAt))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(fmt.Sprintf("%v", s.UpdatedAt))
+	builder.WriteString(", deleted_at=")
+	builder.WriteString(fmt.Sprintf("%v", s.DeletedAt))
 	builder.WriteString(", good_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.GoodID))
 	builder.WriteString(", total=")

@@ -2,7 +2,6 @@ package mixin
 
 import (
 	"entgo.io/ent"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/mixin"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/privacy"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/rule"
 )

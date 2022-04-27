@@ -210,5 +210,6 @@ func (c *StockClient) GetX(ctx context.Context, id uuid.UUID) *Stock {
 
 // Hooks returns the client hooks.
 func (c *StockClient) Hooks() []Hook {
-	return c.hooks.Stock
+	hooks := c.hooks.Stock
+	return append(hooks[:len(hooks):len(hooks)], stock.Hooks[:]...)
 }

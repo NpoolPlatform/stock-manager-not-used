@@ -28,6 +28,61 @@ func (su *StockUpdate) Where(ps ...predicate.Stock) *StockUpdate {
 	return su
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (su *StockUpdate) SetCreatedAt(u uint32) *StockUpdate {
+	su.mutation.ResetCreatedAt()
+	su.mutation.SetCreatedAt(u)
+	return su
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (su *StockUpdate) SetNillableCreatedAt(u *uint32) *StockUpdate {
+	if u != nil {
+		su.SetCreatedAt(*u)
+	}
+	return su
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (su *StockUpdate) AddCreatedAt(u int32) *StockUpdate {
+	su.mutation.AddCreatedAt(u)
+	return su
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (su *StockUpdate) SetUpdatedAt(u uint32) *StockUpdate {
+	su.mutation.ResetUpdatedAt()
+	su.mutation.SetUpdatedAt(u)
+	return su
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (su *StockUpdate) AddUpdatedAt(u int32) *StockUpdate {
+	su.mutation.AddUpdatedAt(u)
+	return su
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (su *StockUpdate) SetDeletedAt(u uint32) *StockUpdate {
+	su.mutation.ResetDeletedAt()
+	su.mutation.SetDeletedAt(u)
+	return su
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (su *StockUpdate) SetNillableDeletedAt(u *uint32) *StockUpdate {
+	if u != nil {
+		su.SetDeletedAt(*u)
+	}
+	return su
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (su *StockUpdate) AddDeletedAt(u int32) *StockUpdate {
+	su.mutation.AddDeletedAt(u)
+	return su
+}
+
 // SetGoodID sets the "good_id" field.
 func (su *StockUpdate) SetGoodID(u uuid.UUID) *StockUpdate {
 	su.mutation.SetGoodID(u)
@@ -84,6 +139,9 @@ func (su *StockUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	if err := su.defaults(); err != nil {
+		return 0, err
+	}
 	if len(su.hooks) == 0 {
 		affected, err = su.sqlSave(ctx)
 	} else {
@@ -132,6 +190,18 @@ func (su *StockUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (su *StockUpdate) defaults() error {
+	if _, ok := su.mutation.UpdatedAt(); !ok {
+		if stock.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized stock.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := stock.UpdateDefaultUpdatedAt()
+		su.mutation.SetUpdatedAt(v)
+	}
+	return nil
+}
+
 func (su *StockUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -149,6 +219,48 @@ func (su *StockUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := su.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldCreatedAt,
+		})
+	}
+	if value, ok := su.mutation.AddedCreatedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldCreatedAt,
+		})
+	}
+	if value, ok := su.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldUpdatedAt,
+		})
+	}
+	if value, ok := su.mutation.AddedUpdatedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldUpdatedAt,
+		})
+	}
+	if value, ok := su.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldDeletedAt,
+		})
+	}
+	if value, ok := su.mutation.AddedDeletedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldDeletedAt,
+		})
 	}
 	if value, ok := su.mutation.GoodID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -218,6 +330,61 @@ type StockUpdateOne struct {
 	mutation *StockMutation
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (suo *StockUpdateOne) SetCreatedAt(u uint32) *StockUpdateOne {
+	suo.mutation.ResetCreatedAt()
+	suo.mutation.SetCreatedAt(u)
+	return suo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (suo *StockUpdateOne) SetNillableCreatedAt(u *uint32) *StockUpdateOne {
+	if u != nil {
+		suo.SetCreatedAt(*u)
+	}
+	return suo
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (suo *StockUpdateOne) AddCreatedAt(u int32) *StockUpdateOne {
+	suo.mutation.AddCreatedAt(u)
+	return suo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (suo *StockUpdateOne) SetUpdatedAt(u uint32) *StockUpdateOne {
+	suo.mutation.ResetUpdatedAt()
+	suo.mutation.SetUpdatedAt(u)
+	return suo
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (suo *StockUpdateOne) AddUpdatedAt(u int32) *StockUpdateOne {
+	suo.mutation.AddUpdatedAt(u)
+	return suo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (suo *StockUpdateOne) SetDeletedAt(u uint32) *StockUpdateOne {
+	suo.mutation.ResetDeletedAt()
+	suo.mutation.SetDeletedAt(u)
+	return suo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (suo *StockUpdateOne) SetNillableDeletedAt(u *uint32) *StockUpdateOne {
+	if u != nil {
+		suo.SetDeletedAt(*u)
+	}
+	return suo
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (suo *StockUpdateOne) AddDeletedAt(u int32) *StockUpdateOne {
+	suo.mutation.AddDeletedAt(u)
+	return suo
+}
+
 // SetGoodID sets the "good_id" field.
 func (suo *StockUpdateOne) SetGoodID(u uuid.UUID) *StockUpdateOne {
 	suo.mutation.SetGoodID(u)
@@ -281,6 +448,9 @@ func (suo *StockUpdateOne) Save(ctx context.Context) (*Stock, error) {
 		err  error
 		node *Stock
 	)
+	if err := suo.defaults(); err != nil {
+		return nil, err
+	}
 	if len(suo.hooks) == 0 {
 		node, err = suo.sqlSave(ctx)
 	} else {
@@ -329,6 +499,18 @@ func (suo *StockUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (suo *StockUpdateOne) defaults() error {
+	if _, ok := suo.mutation.UpdatedAt(); !ok {
+		if stock.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized stock.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := stock.UpdateDefaultUpdatedAt()
+		suo.mutation.SetUpdatedAt(v)
+	}
+	return nil
+}
+
 func (suo *StockUpdateOne) sqlSave(ctx context.Context) (_node *Stock, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -363,6 +545,48 @@ func (suo *StockUpdateOne) sqlSave(ctx context.Context) (_node *Stock, err error
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := suo.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldCreatedAt,
+		})
+	}
+	if value, ok := suo.mutation.AddedCreatedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldCreatedAt,
+		})
+	}
+	if value, ok := suo.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldUpdatedAt,
+		})
+	}
+	if value, ok := suo.mutation.AddedUpdatedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldUpdatedAt,
+		})
+	}
+	if value, ok := suo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldDeletedAt,
+		})
+	}
+	if value, ok := suo.mutation.AddedDeletedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldDeletedAt,
+		})
 	}
 	if value, ok := suo.mutation.GoodID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

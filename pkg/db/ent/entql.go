@@ -25,6 +25,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Stock",
 		Fields: map[string]*sqlgraph.FieldSpec{
+			stock.FieldCreatedAt: {Type: field.TypeUint32, Column: stock.FieldCreatedAt},
+			stock.FieldUpdatedAt: {Type: field.TypeUint32, Column: stock.FieldUpdatedAt},
+			stock.FieldDeletedAt: {Type: field.TypeUint32, Column: stock.FieldDeletedAt},
 			stock.FieldGoodID:    {Type: field.TypeUUID, Column: stock.FieldGoodID},
 			stock.FieldTotal:     {Type: field.TypeInt32, Column: stock.FieldTotal},
 			stock.FieldInService: {Type: field.TypeInt32, Column: stock.FieldInService},
@@ -77,6 +80,21 @@ func (f *StockFilter) Where(p entql.P) {
 // WhereID applies the entql [16]byte predicate on the id field.
 func (f *StockFilter) WhereID(p entql.ValueP) {
 	f.Where(p.Field(stock.FieldID))
+}
+
+// WhereCreatedAt applies the entql uint32 predicate on the created_at field.
+func (f *StockFilter) WhereCreatedAt(p entql.Uint32P) {
+	f.Where(p.Field(stock.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql uint32 predicate on the updated_at field.
+func (f *StockFilter) WhereUpdatedAt(p entql.Uint32P) {
+	f.Where(p.Field(stock.FieldUpdatedAt))
+}
+
+// WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
+func (f *StockFilter) WhereDeletedAt(p entql.Uint32P) {
+	f.Where(p.Field(stock.FieldDeletedAt))
 }
 
 // WhereGoodID applies the entql [16]byte predicate on the good_id field.

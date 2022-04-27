@@ -255,12 +255,12 @@ func (sq *StockQuery) Clone() *StockQuery {
 // Example:
 //
 //	var v []struct {
-//		GoodID uuid.UUID `json:"good_id,omitempty"`
+//		CreatedAt uint32 `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Stock.Query().
-//		GroupBy(stock.FieldGoodID).
+//		GroupBy(stock.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -282,11 +282,11 @@ func (sq *StockQuery) GroupBy(field string, fields ...string) *StockGroupBy {
 // Example:
 //
 //	var v []struct {
-//		GoodID uuid.UUID `json:"good_id,omitempty"`
+//		CreatedAt uint32 `json:"created_at,omitempty"`
 //	}
 //
 //	client.Stock.Query().
-//		Select(stock.FieldGoodID).
+//		Select(stock.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (sq *StockQuery) Select(fields ...string) *StockSelect {
@@ -306,6 +306,12 @@ func (sq *StockQuery) prepareQuery(ctx context.Context) error {
 			return err
 		}
 		sq.sql = prev
+	}
+	if stock.Policy == nil {
+		return errors.New("ent: uninitialized stock.Policy (forgotten import ent/runtime?)")
+	}
+	if err := stock.Policy.EvalQuery(ctx, sq); err != nil {
+		return err
 	}
 	return nil
 }

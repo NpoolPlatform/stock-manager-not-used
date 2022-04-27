@@ -2,7 +2,54 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/NpoolPlatform/stock-manager/pkg/db/ent/runtime.go
+import (
+	"context"
+
+	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/schema"
+	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
+	"github.com/google/uuid"
+
+	"entgo.io/ent"
+	"entgo.io/ent/privacy"
+)
+
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
+// to their package variables.
+func init() {
+	stockMixin := schema.Stock{}.Mixin()
+	stock.Policy = privacy.NewPolicies(stockMixin[0], schema.Stock{})
+	stock.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := stock.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	stockMixinFields0 := stockMixin[0].Fields()
+	_ = stockMixinFields0
+	stockFields := schema.Stock{}.Fields()
+	_ = stockFields
+	// stockDescCreatedAt is the schema descriptor for created_at field.
+	stockDescCreatedAt := stockMixinFields0[0].Descriptor()
+	// stock.DefaultCreatedAt holds the default value on creation for the created_at field.
+	stock.DefaultCreatedAt = stockDescCreatedAt.Default.(func() uint32)
+	// stockDescUpdatedAt is the schema descriptor for updated_at field.
+	stockDescUpdatedAt := stockMixinFields0[1].Descriptor()
+	// stock.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	stock.DefaultUpdatedAt = stockDescUpdatedAt.Default.(func() uint32)
+	// stock.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	stock.UpdateDefaultUpdatedAt = stockDescUpdatedAt.UpdateDefault.(func() uint32)
+	// stockDescDeletedAt is the schema descriptor for deleted_at field.
+	stockDescDeletedAt := stockMixinFields0[2].Descriptor()
+	// stock.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	stock.DefaultDeletedAt = stockDescDeletedAt.Default.(func() uint32)
+	// stockDescID is the schema descriptor for id field.
+	stockDescID := stockFields[0].Descriptor()
+	// stock.DefaultID holds the default value on creation for the id field.
+	stock.DefaultID = stockDescID.Default.(func() uuid.UUID)
+}
 
 const (
 	Version = "v0.10.1"                                         // Version of ent codegen.

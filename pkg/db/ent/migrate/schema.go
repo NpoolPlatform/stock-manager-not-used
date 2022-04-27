@@ -11,6 +11,9 @@ var (
 	// StocksColumns holds the columns for the "stocks" table.
 	StocksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "good_id", Type: field.TypeUUID},
 		{Name: "total", Type: field.TypeInt32},
 		{Name: "in_service", Type: field.TypeInt32},
@@ -25,7 +28,7 @@ var (
 			{
 				Name:    "stock_good_id",
 				Unique:  true,
-				Columns: []*schema.Column{StocksColumns[1]},
+				Columns: []*schema.Column{StocksColumns[4]},
 			},
 		},
 	}
