@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/migrate"
+	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
 
@@ -162,7 +163,7 @@ func (c *StockClient) UpdateOne(s *Stock) *StockUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *StockClient) UpdateOneID(id int) *StockUpdateOne {
+func (c *StockClient) UpdateOneID(id uuid.UUID) *StockUpdateOne {
 	mutation := newStockMutation(c.config, OpUpdateOne, withStockID(id))
 	return &StockUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -179,7 +180,7 @@ func (c *StockClient) DeleteOne(s *Stock) *StockDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *StockClient) DeleteOneID(id int) *StockDeleteOne {
+func (c *StockClient) DeleteOneID(id uuid.UUID) *StockDeleteOne {
 	builder := c.Delete().Where(stock.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -194,12 +195,12 @@ func (c *StockClient) Query() *StockQuery {
 }
 
 // Get returns a Stock entity by its id.
-func (c *StockClient) Get(ctx context.Context, id int) (*Stock, error) {
+func (c *StockClient) Get(ctx context.Context, id uuid.UUID) (*Stock, error) {
 	return c.Query().Where(stock.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *StockClient) GetX(ctx context.Context, id int) *Stock {
+func (c *StockClient) GetX(ctx context.Context, id uuid.UUID) *Stock {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

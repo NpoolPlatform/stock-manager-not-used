@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
+	"github.com/google/uuid"
 )
 
 // StockUpdate is the builder for updating Stock entities.
@@ -24,6 +25,51 @@ type StockUpdate struct {
 // Where appends a list predicates to the StockUpdate builder.
 func (su *StockUpdate) Where(ps ...predicate.Stock) *StockUpdate {
 	su.mutation.Where(ps...)
+	return su
+}
+
+// SetGoodID sets the "good_id" field.
+func (su *StockUpdate) SetGoodID(u uuid.UUID) *StockUpdate {
+	su.mutation.SetGoodID(u)
+	return su
+}
+
+// SetTotal sets the "total" field.
+func (su *StockUpdate) SetTotal(i int32) *StockUpdate {
+	su.mutation.ResetTotal()
+	su.mutation.SetTotal(i)
+	return su
+}
+
+// AddTotal adds i to the "total" field.
+func (su *StockUpdate) AddTotal(i int32) *StockUpdate {
+	su.mutation.AddTotal(i)
+	return su
+}
+
+// SetInService sets the "in_service" field.
+func (su *StockUpdate) SetInService(i int32) *StockUpdate {
+	su.mutation.ResetInService()
+	su.mutation.SetInService(i)
+	return su
+}
+
+// AddInService adds i to the "in_service" field.
+func (su *StockUpdate) AddInService(i int32) *StockUpdate {
+	su.mutation.AddInService(i)
+	return su
+}
+
+// SetSold sets the "sold" field.
+func (su *StockUpdate) SetSold(i int32) *StockUpdate {
+	su.mutation.ResetSold()
+	su.mutation.SetSold(i)
+	return su
+}
+
+// AddSold adds i to the "sold" field.
+func (su *StockUpdate) AddSold(i int32) *StockUpdate {
+	su.mutation.AddSold(i)
 	return su
 }
 
@@ -92,7 +138,7 @@ func (su *StockUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   stock.Table,
 			Columns: stock.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: stock.FieldID,
 			},
 		},
@@ -103,6 +149,55 @@ func (su *StockUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := su.mutation.GoodID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: stock.FieldGoodID,
+		})
+	}
+	if value, ok := su.mutation.Total(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldTotal,
+		})
+	}
+	if value, ok := su.mutation.AddedTotal(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldTotal,
+		})
+	}
+	if value, ok := su.mutation.InService(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldInService,
+		})
+	}
+	if value, ok := su.mutation.AddedInService(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldInService,
+		})
+	}
+	if value, ok := su.mutation.Sold(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldSold,
+		})
+	}
+	if value, ok := su.mutation.AddedSold(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldSold,
+		})
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -121,6 +216,51 @@ type StockUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *StockMutation
+}
+
+// SetGoodID sets the "good_id" field.
+func (suo *StockUpdateOne) SetGoodID(u uuid.UUID) *StockUpdateOne {
+	suo.mutation.SetGoodID(u)
+	return suo
+}
+
+// SetTotal sets the "total" field.
+func (suo *StockUpdateOne) SetTotal(i int32) *StockUpdateOne {
+	suo.mutation.ResetTotal()
+	suo.mutation.SetTotal(i)
+	return suo
+}
+
+// AddTotal adds i to the "total" field.
+func (suo *StockUpdateOne) AddTotal(i int32) *StockUpdateOne {
+	suo.mutation.AddTotal(i)
+	return suo
+}
+
+// SetInService sets the "in_service" field.
+func (suo *StockUpdateOne) SetInService(i int32) *StockUpdateOne {
+	suo.mutation.ResetInService()
+	suo.mutation.SetInService(i)
+	return suo
+}
+
+// AddInService adds i to the "in_service" field.
+func (suo *StockUpdateOne) AddInService(i int32) *StockUpdateOne {
+	suo.mutation.AddInService(i)
+	return suo
+}
+
+// SetSold sets the "sold" field.
+func (suo *StockUpdateOne) SetSold(i int32) *StockUpdateOne {
+	suo.mutation.ResetSold()
+	suo.mutation.SetSold(i)
+	return suo
+}
+
+// AddSold adds i to the "sold" field.
+func (suo *StockUpdateOne) AddSold(i int32) *StockUpdateOne {
+	suo.mutation.AddSold(i)
+	return suo
 }
 
 // Mutation returns the StockMutation object of the builder.
@@ -195,7 +335,7 @@ func (suo *StockUpdateOne) sqlSave(ctx context.Context) (_node *Stock, err error
 			Table:   stock.Table,
 			Columns: stock.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: stock.FieldID,
 			},
 		},
@@ -223,6 +363,55 @@ func (suo *StockUpdateOne) sqlSave(ctx context.Context) (_node *Stock, err error
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := suo.mutation.GoodID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: stock.FieldGoodID,
+		})
+	}
+	if value, ok := suo.mutation.Total(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldTotal,
+		})
+	}
+	if value, ok := suo.mutation.AddedTotal(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldTotal,
+		})
+	}
+	if value, ok := suo.mutation.InService(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldInService,
+		})
+	}
+	if value, ok := suo.mutation.AddedInService(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldInService,
+		})
+	}
+	if value, ok := suo.mutation.Sold(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldSold,
+		})
+	}
+	if value, ok := suo.mutation.AddedSold(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldSold,
+		})
 	}
 	_node = &Stock{config: suo.config}
 	_spec.Assign = _node.assignValues

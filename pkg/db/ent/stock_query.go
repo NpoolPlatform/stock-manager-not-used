@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
+	"github.com/google/uuid"
 )
 
 // StockQuery is the builder for querying Stock entities.
@@ -84,8 +85,8 @@ func (sq *StockQuery) FirstX(ctx context.Context) *Stock {
 
 // FirstID returns the first Stock ID from the query.
 // Returns a *NotFoundError when no Stock ID was found.
-func (sq *StockQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *StockQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -97,7 +98,7 @@ func (sq *StockQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *StockQuery) FirstIDX(ctx context.Context) int {
+func (sq *StockQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -135,8 +136,8 @@ func (sq *StockQuery) OnlyX(ctx context.Context) *Stock {
 // OnlyID is like Only, but returns the only Stock ID in the query.
 // Returns a *NotSingularError when more than one Stock ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *StockQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *StockQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -152,7 +153,7 @@ func (sq *StockQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *StockQuery) OnlyIDX(ctx context.Context) int {
+func (sq *StockQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,8 +179,8 @@ func (sq *StockQuery) AllX(ctx context.Context) []*Stock {
 }
 
 // IDs executes the query and returns a list of Stock IDs.
-func (sq *StockQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (sq *StockQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := sq.Select(stock.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -187,7 +188,7 @@ func (sq *StockQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *StockQuery) IDsX(ctx context.Context) []int {
+func (sq *StockQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -250,6 +251,19 @@ func (sq *StockQuery) Clone() *StockQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		GoodID uuid.UUID `json:"good_id,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Stock.Query().
+//		GroupBy(stock.FieldGoodID).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
+//
 func (sq *StockQuery) GroupBy(field string, fields ...string) *StockGroupBy {
 	group := &StockGroupBy{config: sq.config}
 	group.fields = append([]string{field}, fields...)
@@ -264,6 +278,17 @@ func (sq *StockQuery) GroupBy(field string, fields ...string) *StockGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		GoodID uuid.UUID `json:"good_id,omitempty"`
+//	}
+//
+//	client.Stock.Query().
+//		Select(stock.FieldGoodID).
+//		Scan(ctx, &v)
+//
 func (sq *StockQuery) Select(fields ...string) *StockSelect {
 	sq.fields = append(sq.fields, fields...)
 	return &StockSelect{StockQuery: sq}
@@ -334,7 +359,7 @@ func (sq *StockQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   stock.Table,
 			Columns: stock.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: stock.FieldID,
 			},
 		},

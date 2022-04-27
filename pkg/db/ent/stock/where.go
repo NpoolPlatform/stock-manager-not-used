@@ -5,31 +5,32 @@ package stock
 import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Stock {
+func ID(id uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Stock {
+func IDEQ(id uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Stock {
+func IDNEQ(id uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Stock {
+func IDIn(ids ...uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -46,7 +47,7 @@ func IDIn(ids ...int) predicate.Stock {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Stock {
+func IDNotIn(ids ...uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -63,30 +64,362 @@ func IDNotIn(ids ...int) predicate.Stock {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Stock {
+func IDGT(id uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Stock {
+func IDGTE(id uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Stock {
+func IDLT(id uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Stock {
+func IDLTE(id uuid.UUID) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
+	})
+}
+
+// GoodID applies equality check predicate on the "good_id" field. It's identical to GoodIDEQ.
+func GoodID(v uuid.UUID) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGoodID), v))
+	})
+}
+
+// Total applies equality check predicate on the "total" field. It's identical to TotalEQ.
+func Total(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTotal), v))
+	})
+}
+
+// InService applies equality check predicate on the "in_service" field. It's identical to InServiceEQ.
+func InService(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldInService), v))
+	})
+}
+
+// Sold applies equality check predicate on the "sold" field. It's identical to SoldEQ.
+func Sold(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSold), v))
+	})
+}
+
+// GoodIDEQ applies the EQ predicate on the "good_id" field.
+func GoodIDEQ(v uuid.UUID) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGoodID), v))
+	})
+}
+
+// GoodIDNEQ applies the NEQ predicate on the "good_id" field.
+func GoodIDNEQ(v uuid.UUID) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldGoodID), v))
+	})
+}
+
+// GoodIDIn applies the In predicate on the "good_id" field.
+func GoodIDIn(vs ...uuid.UUID) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldGoodID), v...))
+	})
+}
+
+// GoodIDNotIn applies the NotIn predicate on the "good_id" field.
+func GoodIDNotIn(vs ...uuid.UUID) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldGoodID), v...))
+	})
+}
+
+// GoodIDGT applies the GT predicate on the "good_id" field.
+func GoodIDGT(v uuid.UUID) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldGoodID), v))
+	})
+}
+
+// GoodIDGTE applies the GTE predicate on the "good_id" field.
+func GoodIDGTE(v uuid.UUID) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldGoodID), v))
+	})
+}
+
+// GoodIDLT applies the LT predicate on the "good_id" field.
+func GoodIDLT(v uuid.UUID) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldGoodID), v))
+	})
+}
+
+// GoodIDLTE applies the LTE predicate on the "good_id" field.
+func GoodIDLTE(v uuid.UUID) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldGoodID), v))
+	})
+}
+
+// TotalEQ applies the EQ predicate on the "total" field.
+func TotalEQ(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTotal), v))
+	})
+}
+
+// TotalNEQ applies the NEQ predicate on the "total" field.
+func TotalNEQ(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTotal), v))
+	})
+}
+
+// TotalIn applies the In predicate on the "total" field.
+func TotalIn(vs ...int32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTotal), v...))
+	})
+}
+
+// TotalNotIn applies the NotIn predicate on the "total" field.
+func TotalNotIn(vs ...int32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTotal), v...))
+	})
+}
+
+// TotalGT applies the GT predicate on the "total" field.
+func TotalGT(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTotal), v))
+	})
+}
+
+// TotalGTE applies the GTE predicate on the "total" field.
+func TotalGTE(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTotal), v))
+	})
+}
+
+// TotalLT applies the LT predicate on the "total" field.
+func TotalLT(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTotal), v))
+	})
+}
+
+// TotalLTE applies the LTE predicate on the "total" field.
+func TotalLTE(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTotal), v))
+	})
+}
+
+// InServiceEQ applies the EQ predicate on the "in_service" field.
+func InServiceEQ(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldInService), v))
+	})
+}
+
+// InServiceNEQ applies the NEQ predicate on the "in_service" field.
+func InServiceNEQ(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldInService), v))
+	})
+}
+
+// InServiceIn applies the In predicate on the "in_service" field.
+func InServiceIn(vs ...int32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldInService), v...))
+	})
+}
+
+// InServiceNotIn applies the NotIn predicate on the "in_service" field.
+func InServiceNotIn(vs ...int32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldInService), v...))
+	})
+}
+
+// InServiceGT applies the GT predicate on the "in_service" field.
+func InServiceGT(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldInService), v))
+	})
+}
+
+// InServiceGTE applies the GTE predicate on the "in_service" field.
+func InServiceGTE(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldInService), v))
+	})
+}
+
+// InServiceLT applies the LT predicate on the "in_service" field.
+func InServiceLT(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldInService), v))
+	})
+}
+
+// InServiceLTE applies the LTE predicate on the "in_service" field.
+func InServiceLTE(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldInService), v))
+	})
+}
+
+// SoldEQ applies the EQ predicate on the "sold" field.
+func SoldEQ(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSold), v))
+	})
+}
+
+// SoldNEQ applies the NEQ predicate on the "sold" field.
+func SoldNEQ(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSold), v))
+	})
+}
+
+// SoldIn applies the In predicate on the "sold" field.
+func SoldIn(vs ...int32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSold), v...))
+	})
+}
+
+// SoldNotIn applies the NotIn predicate on the "sold" field.
+func SoldNotIn(vs ...int32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSold), v...))
+	})
+}
+
+// SoldGT applies the GT predicate on the "sold" field.
+func SoldGT(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSold), v))
+	})
+}
+
+// SoldGTE applies the GTE predicate on the "sold" field.
+func SoldGTE(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSold), v))
+	})
+}
+
+// SoldLT applies the LT predicate on the "sold" field.
+func SoldLT(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSold), v))
+	})
+}
+
+// SoldLTE applies the LTE predicate on the "sold" field.
+func SoldLTE(v int32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSold), v))
 	})
 }
 

@@ -10,13 +10,24 @@ import (
 var (
 	// StocksColumns holds the columns for the "stocks" table.
 	StocksColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "good_id", Type: field.TypeUUID},
+		{Name: "total", Type: field.TypeInt32},
+		{Name: "in_service", Type: field.TypeInt32},
+		{Name: "sold", Type: field.TypeInt32},
 	}
 	// StocksTable holds the schema information for the "stocks" table.
 	StocksTable = &schema.Table{
 		Name:       "stocks",
 		Columns:    StocksColumns,
 		PrimaryKey: []*schema.Column{StocksColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "stock_good_id",
+				Unique:  true,
+				Columns: []*schema.Column{StocksColumns[1]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

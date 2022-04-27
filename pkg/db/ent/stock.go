@@ -8,13 +8,22 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
+	"github.com/google/uuid"
 )
 
 // Stock is the model entity for the Stock schema.
 type Stock struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// GoodID holds the value of the "good_id" field.
+	GoodID uuid.UUID `json:"good_id,omitempty"`
+	// Total holds the value of the "total" field.
+	Total int32 `json:"total,omitempty"`
+	// InService holds the value of the "in_service" field.
+	InService int32 `json:"in_service,omitempty"`
+	// Sold holds the value of the "sold" field.
+	Sold int32 `json:"sold,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -22,8 +31,10 @@ func (*Stock) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case stock.FieldID:
+		case stock.FieldTotal, stock.FieldInService, stock.FieldSold:
 			values[i] = new(sql.NullInt64)
+		case stock.FieldID, stock.FieldGoodID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Stock", columns[i])
 		}
@@ -40,11 +51,35 @@ func (s *Stock) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case stock.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				s.ID = *value
 			}
-			s.ID = int(value.Int64)
+		case stock.FieldGoodID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field good_id", values[i])
+			} else if value != nil {
+				s.GoodID = *value
+			}
+		case stock.FieldTotal:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field total", values[i])
+			} else if value.Valid {
+				s.Total = int32(value.Int64)
+			}
+		case stock.FieldInService:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field in_service", values[i])
+			} else if value.Valid {
+				s.InService = int32(value.Int64)
+			}
+		case stock.FieldSold:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sold", values[i])
+			} else if value.Valid {
+				s.Sold = int32(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -73,6 +108,14 @@ func (s *Stock) String() string {
 	var builder strings.Builder
 	builder.WriteString("Stock(")
 	builder.WriteString(fmt.Sprintf("id=%v", s.ID))
+	builder.WriteString(", good_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.GoodID))
+	builder.WriteString(", total=")
+	builder.WriteString(fmt.Sprintf("%v", s.Total))
+	builder.WriteString(", in_service=")
+	builder.WriteString(fmt.Sprintf("%v", s.InService))
+	builder.WriteString(", sold=")
+	builder.WriteString(fmt.Sprintf("%v", s.Sold))
 	builder.WriteByte(')')
 	return builder.String()
 }

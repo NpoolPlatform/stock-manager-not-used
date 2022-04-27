@@ -2,11 +2,23 @@
 
 package stock
 
+import (
+	"github.com/google/uuid"
+)
+
 const (
 	// Label holds the string label denoting the stock type in the database.
 	Label = "stock"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldGoodID holds the string denoting the good_id field in the database.
+	FieldGoodID = "good_id"
+	// FieldTotal holds the string denoting the total field in the database.
+	FieldTotal = "total"
+	// FieldInService holds the string denoting the in_service field in the database.
+	FieldInService = "in_service"
+	// FieldSold holds the string denoting the sold field in the database.
+	FieldSold = "sold"
 	// Table holds the table name of the stock in the database.
 	Table = "stocks"
 )
@@ -14,6 +26,10 @@ const (
 // Columns holds all SQL columns for stock fields.
 var Columns = []string{
 	FieldID,
+	FieldGoodID,
+	FieldTotal,
+	FieldInService,
+	FieldSold,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -25,3 +41,8 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
+)

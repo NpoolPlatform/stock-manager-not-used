@@ -7,10 +7,12 @@ import (
 	"errors"
 	"fmt"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
+	"github.com/google/uuid"
 )
 
 // StockCreate is the builder for creating a Stock entity.
@@ -19,6 +21,44 @@ type StockCreate struct {
 	mutation *StockMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetGoodID sets the "good_id" field.
+func (sc *StockCreate) SetGoodID(u uuid.UUID) *StockCreate {
+	sc.mutation.SetGoodID(u)
+	return sc
+}
+
+// SetTotal sets the "total" field.
+func (sc *StockCreate) SetTotal(i int32) *StockCreate {
+	sc.mutation.SetTotal(i)
+	return sc
+}
+
+// SetInService sets the "in_service" field.
+func (sc *StockCreate) SetInService(i int32) *StockCreate {
+	sc.mutation.SetInService(i)
+	return sc
+}
+
+// SetSold sets the "sold" field.
+func (sc *StockCreate) SetSold(i int32) *StockCreate {
+	sc.mutation.SetSold(i)
+	return sc
+}
+
+// SetID sets the "id" field.
+func (sc *StockCreate) SetID(u uuid.UUID) *StockCreate {
+	sc.mutation.SetID(u)
+	return sc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (sc *StockCreate) SetNillableID(u *uuid.UUID) *StockCreate {
+	if u != nil {
+		sc.SetID(*u)
+	}
+	return sc
 }
 
 // Mutation returns the StockMutation object of the builder.
@@ -32,6 +72,7 @@ func (sc *StockCreate) Save(ctx context.Context) (*Stock, error) {
 		err  error
 		node *Stock
 	)
+	sc.defaults()
 	if len(sc.hooks) == 0 {
 		if err = sc.check(); err != nil {
 			return nil, err
@@ -89,8 +130,28 @@ func (sc *StockCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (sc *StockCreate) defaults() {
+	if _, ok := sc.mutation.ID(); !ok {
+		v := stock.DefaultID()
+		sc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (sc *StockCreate) check() error {
+	if _, ok := sc.mutation.GoodID(); !ok {
+		return &ValidationError{Name: "good_id", err: errors.New(`ent: missing required field "Stock.good_id"`)}
+	}
+	if _, ok := sc.mutation.Total(); !ok {
+		return &ValidationError{Name: "total", err: errors.New(`ent: missing required field "Stock.total"`)}
+	}
+	if _, ok := sc.mutation.InService(); !ok {
+		return &ValidationError{Name: "in_service", err: errors.New(`ent: missing required field "Stock.in_service"`)}
+	}
+	if _, ok := sc.mutation.Sold(); !ok {
+		return &ValidationError{Name: "sold", err: errors.New(`ent: missing required field "Stock.sold"`)}
+	}
 	return nil
 }
 
@@ -102,8 +163,13 @@ func (sc *StockCreate) sqlSave(ctx context.Context) (*Stock, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	return _node, nil
 }
 
@@ -113,12 +179,48 @@ func (sc *StockCreate) createSpec() (*Stock, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: stock.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: stock.FieldID,
 			},
 		}
 	)
 	_spec.OnConflict = sc.conflict
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
+	if value, ok := sc.mutation.GoodID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: stock.FieldGoodID,
+		})
+		_node.GoodID = value
+	}
+	if value, ok := sc.mutation.Total(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldTotal,
+		})
+		_node.Total = value
+	}
+	if value, ok := sc.mutation.InService(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldInService,
+		})
+		_node.InService = value
+	}
+	if value, ok := sc.mutation.Sold(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: stock.FieldSold,
+		})
+		_node.Sold = value
+	}
 	return _node, _spec
 }
 
@@ -126,11 +228,17 @@ func (sc *StockCreate) createSpec() (*Stock, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Stock.Create().
+//		SetGoodID(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.StockUpsert) {
+//			SetGoodID(v+v).
+//		}).
 //		Exec(ctx)
 //
 func (sc *StockCreate) OnConflict(opts ...sql.ConflictOption) *StockUpsertOne {
@@ -167,17 +275,91 @@ type (
 	}
 )
 
-// UpdateNewValues updates the mutable fields using the new values that were set on create.
+// SetGoodID sets the "good_id" field.
+func (u *StockUpsert) SetGoodID(v uuid.UUID) *StockUpsert {
+	u.Set(stock.FieldGoodID, v)
+	return u
+}
+
+// UpdateGoodID sets the "good_id" field to the value that was provided on create.
+func (u *StockUpsert) UpdateGoodID() *StockUpsert {
+	u.SetExcluded(stock.FieldGoodID)
+	return u
+}
+
+// SetTotal sets the "total" field.
+func (u *StockUpsert) SetTotal(v int32) *StockUpsert {
+	u.Set(stock.FieldTotal, v)
+	return u
+}
+
+// UpdateTotal sets the "total" field to the value that was provided on create.
+func (u *StockUpsert) UpdateTotal() *StockUpsert {
+	u.SetExcluded(stock.FieldTotal)
+	return u
+}
+
+// AddTotal adds v to the "total" field.
+func (u *StockUpsert) AddTotal(v int32) *StockUpsert {
+	u.Add(stock.FieldTotal, v)
+	return u
+}
+
+// SetInService sets the "in_service" field.
+func (u *StockUpsert) SetInService(v int32) *StockUpsert {
+	u.Set(stock.FieldInService, v)
+	return u
+}
+
+// UpdateInService sets the "in_service" field to the value that was provided on create.
+func (u *StockUpsert) UpdateInService() *StockUpsert {
+	u.SetExcluded(stock.FieldInService)
+	return u
+}
+
+// AddInService adds v to the "in_service" field.
+func (u *StockUpsert) AddInService(v int32) *StockUpsert {
+	u.Add(stock.FieldInService, v)
+	return u
+}
+
+// SetSold sets the "sold" field.
+func (u *StockUpsert) SetSold(v int32) *StockUpsert {
+	u.Set(stock.FieldSold, v)
+	return u
+}
+
+// UpdateSold sets the "sold" field to the value that was provided on create.
+func (u *StockUpsert) UpdateSold() *StockUpsert {
+	u.SetExcluded(stock.FieldSold)
+	return u
+}
+
+// AddSold adds v to the "sold" field.
+func (u *StockUpsert) AddSold(v int32) *StockUpsert {
+	u.Add(stock.FieldSold, v)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
 //	client.Stock.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(stock.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
 func (u *StockUpsertOne) UpdateNewValues() *StockUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(stock.FieldID)
+		}
+	}))
 	return u
 }
 
@@ -209,6 +391,83 @@ func (u *StockUpsertOne) Update(set func(*StockUpsert)) *StockUpsertOne {
 	return u
 }
 
+// SetGoodID sets the "good_id" field.
+func (u *StockUpsertOne) SetGoodID(v uuid.UUID) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.SetGoodID(v)
+	})
+}
+
+// UpdateGoodID sets the "good_id" field to the value that was provided on create.
+func (u *StockUpsertOne) UpdateGoodID() *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateGoodID()
+	})
+}
+
+// SetTotal sets the "total" field.
+func (u *StockUpsertOne) SetTotal(v int32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.SetTotal(v)
+	})
+}
+
+// AddTotal adds v to the "total" field.
+func (u *StockUpsertOne) AddTotal(v int32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.AddTotal(v)
+	})
+}
+
+// UpdateTotal sets the "total" field to the value that was provided on create.
+func (u *StockUpsertOne) UpdateTotal() *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateTotal()
+	})
+}
+
+// SetInService sets the "in_service" field.
+func (u *StockUpsertOne) SetInService(v int32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.SetInService(v)
+	})
+}
+
+// AddInService adds v to the "in_service" field.
+func (u *StockUpsertOne) AddInService(v int32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.AddInService(v)
+	})
+}
+
+// UpdateInService sets the "in_service" field to the value that was provided on create.
+func (u *StockUpsertOne) UpdateInService() *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateInService()
+	})
+}
+
+// SetSold sets the "sold" field.
+func (u *StockUpsertOne) SetSold(v int32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.SetSold(v)
+	})
+}
+
+// AddSold adds v to the "sold" field.
+func (u *StockUpsertOne) AddSold(v int32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.AddSold(v)
+	})
+}
+
+// UpdateSold sets the "sold" field to the value that was provided on create.
+func (u *StockUpsertOne) UpdateSold() *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateSold()
+	})
+}
+
 // Exec executes the query.
 func (u *StockUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -225,7 +484,12 @@ func (u *StockUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *StockUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *StockUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: StockUpsertOne.ID is not supported by MySQL driver. Use StockUpsertOne.Exec instead")
+	}
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -234,7 +498,7 @@ func (u *StockUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *StockUpsertOne) IDX(ctx context.Context) int {
+func (u *StockUpsertOne) IDX(ctx context.Context) uuid.UUID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -257,6 +521,7 @@ func (scb *StockCreateBulk) Save(ctx context.Context) ([]*Stock, error) {
 	for i := range scb.builders {
 		func(i int, root context.Context) {
 			builder := scb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*StockMutation)
 				if !ok {
@@ -285,10 +550,6 @@ func (scb *StockCreateBulk) Save(ctx context.Context) ([]*Stock, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {
@@ -336,6 +597,11 @@ func (scb *StockCreateBulk) ExecX(ctx context.Context) {
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.StockUpsert) {
+//			SetGoodID(v+v).
+//		}).
 //		Exec(ctx)
 //
 func (scb *StockCreateBulk) OnConflict(opts ...sql.ConflictOption) *StockUpsertBulk {
@@ -371,11 +637,22 @@ type StockUpsertBulk struct {
 //	client.Stock.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(stock.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
 func (u *StockUpsertBulk) UpdateNewValues() *StockUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(stock.FieldID)
+				return
+			}
+		}
+	}))
 	return u
 }
 
@@ -405,6 +682,83 @@ func (u *StockUpsertBulk) Update(set func(*StockUpsert)) *StockUpsertBulk {
 		set(&StockUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetGoodID sets the "good_id" field.
+func (u *StockUpsertBulk) SetGoodID(v uuid.UUID) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.SetGoodID(v)
+	})
+}
+
+// UpdateGoodID sets the "good_id" field to the value that was provided on create.
+func (u *StockUpsertBulk) UpdateGoodID() *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateGoodID()
+	})
+}
+
+// SetTotal sets the "total" field.
+func (u *StockUpsertBulk) SetTotal(v int32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.SetTotal(v)
+	})
+}
+
+// AddTotal adds v to the "total" field.
+func (u *StockUpsertBulk) AddTotal(v int32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.AddTotal(v)
+	})
+}
+
+// UpdateTotal sets the "total" field to the value that was provided on create.
+func (u *StockUpsertBulk) UpdateTotal() *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateTotal()
+	})
+}
+
+// SetInService sets the "in_service" field.
+func (u *StockUpsertBulk) SetInService(v int32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.SetInService(v)
+	})
+}
+
+// AddInService adds v to the "in_service" field.
+func (u *StockUpsertBulk) AddInService(v int32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.AddInService(v)
+	})
+}
+
+// UpdateInService sets the "in_service" field to the value that was provided on create.
+func (u *StockUpsertBulk) UpdateInService() *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateInService()
+	})
+}
+
+// SetSold sets the "sold" field.
+func (u *StockUpsertBulk) SetSold(v int32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.SetSold(v)
+	})
+}
+
+// AddSold adds v to the "sold" field.
+func (u *StockUpsertBulk) AddSold(v int32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.AddSold(v)
+	})
+}
+
+// UpdateSold sets the "sold" field to the value that was provided on create.
+func (u *StockUpsertBulk) UpdateSold() *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateSold()
+	})
 }
 
 // Exec executes the query.
