@@ -1,4 +1,4 @@
-package schema
+package mixin
 
 import (
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/mixin"

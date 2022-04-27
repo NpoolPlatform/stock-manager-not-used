@@ -15,6 +15,12 @@ type Stock struct {
 	mixin.TimeMixin
 }
 
+func (Stock) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.TimeMixin{},
+	}
+}
+
 // Fields of the Stock.
 func (Stock) Fields() []ent.Field {
 	return []ent.Field{
