@@ -44,13 +44,13 @@ func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 	var info *ent.Stock
 	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func() error {
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		info, err = s.Tx.Stock.Create().
 			SetGoodID(uuid.MustParse(in.GetGoodID())).
 			SetTotal(in.GetTotal()).
-			SetInService(in.GetInService()).
-			SetSold(in.GetSold()).
-			Save(ctx)
+			SetInService(0).
+			SetSold(0).
+			Save(_ctx)
 		return err
 	})
 	if err != nil {
@@ -61,7 +61,31 @@ func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 }
 
 func (s *Stock) CreateBulk(ctx context.Context, in []*npool.Stock) ([]*npool.Stock, error) {
-	return nil, nil
+	rows := []*ent.Stock{}
+	var err error
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		bulk := make([]*ent.StockCreate, len(in))
+		for i, info := range in {
+			bulk[i] = s.Tx.Stock.Create().
+				SetGoodID(uuid.MustParse(info.GetGoodID())).
+				SetTotal(info.GetTotal()).
+				SetInService(0).
+				SetSold(0)
+		}
+		rows, err = s.Tx.Stock.CreateBulk(bulk...).Save(_ctx)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail create stocks: %v", err)
+	}
+
+	infos := []*npool.Stock{}
+	for _, row := range rows {
+		infos = append(infos, s.rowToObject(row))
+	}
+
+	return infos, nil
 }
 
 func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, error) {
