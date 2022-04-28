@@ -48,6 +48,17 @@ func TestCRUD(t *testing.T) {
 		assertStock(t, info, &stock)
 	}
 
+	stock.InService = 100
+	stock.ID = info.ID
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	info, err = schema.Update(context.Background(), &stock)
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
 	stock1 := &npool.Stock{
 		GoodID:    uuid.New().String(),
 		Total:     1000,

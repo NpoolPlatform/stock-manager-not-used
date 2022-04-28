@@ -89,7 +89,21 @@ func (s *Stock) CreateBulk(ctx context.Context, in []*npool.Stock) ([]*npool.Sto
 }
 
 func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, error) {
-	return nil, nil
+	var info *ent.Stock
+	var err error
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		info, err = s.Tx.Stock.UpdateOneID(uuid.MustParse(in.GetID())).
+			SetInService(in.GetInService()).
+			SetSold(in.GetSold()).
+			Save(_ctx)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail update stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
 }
 
 func (s *Stock) UpdateFields(ctx context.Context, id string, fields map[string]*npool.Stock) (*npool.Stock, error) {
