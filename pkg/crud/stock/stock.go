@@ -34,6 +34,7 @@ func (s *Stock) rowToObject(row *ent.Stock) *npool.Stock {
 	return &npool.Stock{
 		ID:        row.ID.String(),
 		GoodID:    row.GoodID.String(),
+		Total:     row.Total,
 		InService: row.InService,
 		Sold:      row.Sold,
 	}
@@ -46,6 +47,7 @@ func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 	err = tx.WithTx(ctx, s.Tx, func() error {
 		info, err = s.Tx.Stock.Create().
 			SetGoodID(uuid.MustParse(in.GetGoodID())).
+			SetTotal(in.GetTotal()).
 			SetInService(in.GetInService()).
 			SetSold(in.GetSold()).
 			Save(ctx)
