@@ -25,11 +25,11 @@ type Stock struct {
 	// GoodID holds the value of the "good_id" field.
 	GoodID uuid.UUID `json:"good_id,omitempty"`
 	// Total holds the value of the "total" field.
-	Total int32 `json:"total,omitempty"`
+	Total uint32 `json:"total,omitempty"`
 	// InService holds the value of the "in_service" field.
-	InService int32 `json:"in_service,omitempty"`
+	InService uint32 `json:"in_service,omitempty"`
 	// Sold holds the value of the "sold" field.
-	Sold int32 `json:"sold,omitempty"`
+	Sold uint32 `json:"sold,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -90,19 +90,19 @@ func (s *Stock) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total", values[i])
 			} else if value.Valid {
-				s.Total = int32(value.Int64)
+				s.Total = uint32(value.Int64)
 			}
 		case stock.FieldInService:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field in_service", values[i])
 			} else if value.Valid {
-				s.InService = int32(value.Int64)
+				s.InService = uint32(value.Int64)
 			}
 		case stock.FieldSold:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sold", values[i])
 			} else if value.Valid {
-				s.Sold = int32(value.Int64)
+				s.Sold = uint32(value.Int64)
 			}
 		}
 	}

@@ -120,21 +120,21 @@ func GoodID(v uuid.UUID) predicate.Stock {
 }
 
 // Total applies equality check predicate on the "total" field. It's identical to TotalEQ.
-func Total(v int32) predicate.Stock {
+func Total(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTotal), v))
 	})
 }
 
 // InService applies equality check predicate on the "in_service" field. It's identical to InServiceEQ.
-func InService(v int32) predicate.Stock {
+func InService(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldInService), v))
 	})
 }
 
 // Sold applies equality check predicate on the "sold" field. It's identical to SoldEQ.
-func Sold(v int32) predicate.Stock {
+func Sold(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSold), v))
 	})
@@ -445,21 +445,21 @@ func GoodIDLTE(v uuid.UUID) predicate.Stock {
 }
 
 // TotalEQ applies the EQ predicate on the "total" field.
-func TotalEQ(v int32) predicate.Stock {
+func TotalEQ(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldTotal), v))
 	})
 }
 
 // TotalNEQ applies the NEQ predicate on the "total" field.
-func TotalNEQ(v int32) predicate.Stock {
+func TotalNEQ(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldTotal), v))
 	})
 }
 
 // TotalIn applies the In predicate on the "total" field.
-func TotalIn(vs ...int32) predicate.Stock {
+func TotalIn(vs ...uint32) predicate.Stock {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -476,7 +476,7 @@ func TotalIn(vs ...int32) predicate.Stock {
 }
 
 // TotalNotIn applies the NotIn predicate on the "total" field.
-func TotalNotIn(vs ...int32) predicate.Stock {
+func TotalNotIn(vs ...uint32) predicate.Stock {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -493,49 +493,49 @@ func TotalNotIn(vs ...int32) predicate.Stock {
 }
 
 // TotalGT applies the GT predicate on the "total" field.
-func TotalGT(v int32) predicate.Stock {
+func TotalGT(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldTotal), v))
 	})
 }
 
 // TotalGTE applies the GTE predicate on the "total" field.
-func TotalGTE(v int32) predicate.Stock {
+func TotalGTE(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldTotal), v))
 	})
 }
 
 // TotalLT applies the LT predicate on the "total" field.
-func TotalLT(v int32) predicate.Stock {
+func TotalLT(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldTotal), v))
 	})
 }
 
 // TotalLTE applies the LTE predicate on the "total" field.
-func TotalLTE(v int32) predicate.Stock {
+func TotalLTE(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldTotal), v))
 	})
 }
 
 // InServiceEQ applies the EQ predicate on the "in_service" field.
-func InServiceEQ(v int32) predicate.Stock {
+func InServiceEQ(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldInService), v))
 	})
 }
 
 // InServiceNEQ applies the NEQ predicate on the "in_service" field.
-func InServiceNEQ(v int32) predicate.Stock {
+func InServiceNEQ(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldInService), v))
 	})
 }
 
 // InServiceIn applies the In predicate on the "in_service" field.
-func InServiceIn(vs ...int32) predicate.Stock {
+func InServiceIn(vs ...uint32) predicate.Stock {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -552,7 +552,7 @@ func InServiceIn(vs ...int32) predicate.Stock {
 }
 
 // InServiceNotIn applies the NotIn predicate on the "in_service" field.
-func InServiceNotIn(vs ...int32) predicate.Stock {
+func InServiceNotIn(vs ...uint32) predicate.Stock {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -569,49 +569,49 @@ func InServiceNotIn(vs ...int32) predicate.Stock {
 }
 
 // InServiceGT applies the GT predicate on the "in_service" field.
-func InServiceGT(v int32) predicate.Stock {
+func InServiceGT(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldInService), v))
 	})
 }
 
 // InServiceGTE applies the GTE predicate on the "in_service" field.
-func InServiceGTE(v int32) predicate.Stock {
+func InServiceGTE(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldInService), v))
 	})
 }
 
 // InServiceLT applies the LT predicate on the "in_service" field.
-func InServiceLT(v int32) predicate.Stock {
+func InServiceLT(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldInService), v))
 	})
 }
 
 // InServiceLTE applies the LTE predicate on the "in_service" field.
-func InServiceLTE(v int32) predicate.Stock {
+func InServiceLTE(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldInService), v))
 	})
 }
 
 // SoldEQ applies the EQ predicate on the "sold" field.
-func SoldEQ(v int32) predicate.Stock {
+func SoldEQ(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSold), v))
 	})
 }
 
 // SoldNEQ applies the NEQ predicate on the "sold" field.
-func SoldNEQ(v int32) predicate.Stock {
+func SoldNEQ(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldSold), v))
 	})
 }
 
 // SoldIn applies the In predicate on the "sold" field.
-func SoldIn(vs ...int32) predicate.Stock {
+func SoldIn(vs ...uint32) predicate.Stock {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -628,7 +628,7 @@ func SoldIn(vs ...int32) predicate.Stock {
 }
 
 // SoldNotIn applies the NotIn predicate on the "sold" field.
-func SoldNotIn(vs ...int32) predicate.Stock {
+func SoldNotIn(vs ...uint32) predicate.Stock {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -645,28 +645,28 @@ func SoldNotIn(vs ...int32) predicate.Stock {
 }
 
 // SoldGT applies the GT predicate on the "sold" field.
-func SoldGT(v int32) predicate.Stock {
+func SoldGT(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldSold), v))
 	})
 }
 
 // SoldGTE applies the GTE predicate on the "sold" field.
-func SoldGTE(v int32) predicate.Stock {
+func SoldGTE(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldSold), v))
 	})
 }
 
 // SoldLT applies the LT predicate on the "sold" field.
-func SoldLT(v int32) predicate.Stock {
+func SoldLT(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldSold), v))
 	})
 }
 
 // SoldLTE applies the LTE predicate on the "sold" field.
-func SoldLTE(v int32) predicate.Stock {
+func SoldLTE(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldSold), v))
 	})

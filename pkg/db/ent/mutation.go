@@ -40,11 +40,11 @@ type StockMutation struct {
 	deleted_at    *uint32
 	adddeleted_at *int32
 	good_id       *uuid.UUID
-	total         *int32
+	total         *uint32
 	addtotal      *int32
-	in_service    *int32
+	in_service    *uint32
 	addin_service *int32
-	sold          *int32
+	sold          *uint32
 	addsold       *int32
 	clearedFields map[string]struct{}
 	done          bool
@@ -361,13 +361,13 @@ func (m *StockMutation) ResetGoodID() {
 }
 
 // SetTotal sets the "total" field.
-func (m *StockMutation) SetTotal(i int32) {
-	m.total = &i
+func (m *StockMutation) SetTotal(u uint32) {
+	m.total = &u
 	m.addtotal = nil
 }
 
 // Total returns the value of the "total" field in the mutation.
-func (m *StockMutation) Total() (r int32, exists bool) {
+func (m *StockMutation) Total() (r uint32, exists bool) {
 	v := m.total
 	if v == nil {
 		return
@@ -378,7 +378,7 @@ func (m *StockMutation) Total() (r int32, exists bool) {
 // OldTotal returns the old "total" field's value of the Stock entity.
 // If the Stock object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StockMutation) OldTotal(ctx context.Context) (v int32, err error) {
+func (m *StockMutation) OldTotal(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotal is only allowed on UpdateOne operations")
 	}
@@ -392,12 +392,12 @@ func (m *StockMutation) OldTotal(ctx context.Context) (v int32, err error) {
 	return oldValue.Total, nil
 }
 
-// AddTotal adds i to the "total" field.
-func (m *StockMutation) AddTotal(i int32) {
+// AddTotal adds u to the "total" field.
+func (m *StockMutation) AddTotal(u int32) {
 	if m.addtotal != nil {
-		*m.addtotal += i
+		*m.addtotal += u
 	} else {
-		m.addtotal = &i
+		m.addtotal = &u
 	}
 }
 
@@ -417,13 +417,13 @@ func (m *StockMutation) ResetTotal() {
 }
 
 // SetInService sets the "in_service" field.
-func (m *StockMutation) SetInService(i int32) {
-	m.in_service = &i
+func (m *StockMutation) SetInService(u uint32) {
+	m.in_service = &u
 	m.addin_service = nil
 }
 
 // InService returns the value of the "in_service" field in the mutation.
-func (m *StockMutation) InService() (r int32, exists bool) {
+func (m *StockMutation) InService() (r uint32, exists bool) {
 	v := m.in_service
 	if v == nil {
 		return
@@ -434,7 +434,7 @@ func (m *StockMutation) InService() (r int32, exists bool) {
 // OldInService returns the old "in_service" field's value of the Stock entity.
 // If the Stock object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StockMutation) OldInService(ctx context.Context) (v int32, err error) {
+func (m *StockMutation) OldInService(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldInService is only allowed on UpdateOne operations")
 	}
@@ -448,12 +448,12 @@ func (m *StockMutation) OldInService(ctx context.Context) (v int32, err error) {
 	return oldValue.InService, nil
 }
 
-// AddInService adds i to the "in_service" field.
-func (m *StockMutation) AddInService(i int32) {
+// AddInService adds u to the "in_service" field.
+func (m *StockMutation) AddInService(u int32) {
 	if m.addin_service != nil {
-		*m.addin_service += i
+		*m.addin_service += u
 	} else {
-		m.addin_service = &i
+		m.addin_service = &u
 	}
 }
 
@@ -473,13 +473,13 @@ func (m *StockMutation) ResetInService() {
 }
 
 // SetSold sets the "sold" field.
-func (m *StockMutation) SetSold(i int32) {
-	m.sold = &i
+func (m *StockMutation) SetSold(u uint32) {
+	m.sold = &u
 	m.addsold = nil
 }
 
 // Sold returns the value of the "sold" field in the mutation.
-func (m *StockMutation) Sold() (r int32, exists bool) {
+func (m *StockMutation) Sold() (r uint32, exists bool) {
 	v := m.sold
 	if v == nil {
 		return
@@ -490,7 +490,7 @@ func (m *StockMutation) Sold() (r int32, exists bool) {
 // OldSold returns the old "sold" field's value of the Stock entity.
 // If the Stock object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *StockMutation) OldSold(ctx context.Context) (v int32, err error) {
+func (m *StockMutation) OldSold(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSold is only allowed on UpdateOne operations")
 	}
@@ -504,12 +504,12 @@ func (m *StockMutation) OldSold(ctx context.Context) (v int32, err error) {
 	return oldValue.Sold, nil
 }
 
-// AddSold adds i to the "sold" field.
-func (m *StockMutation) AddSold(i int32) {
+// AddSold adds u to the "sold" field.
+func (m *StockMutation) AddSold(u int32) {
 	if m.addsold != nil {
-		*m.addsold += i
+		*m.addsold += u
 	} else {
-		m.addsold = &i
+		m.addsold = &u
 	}
 }
 
@@ -652,21 +652,21 @@ func (m *StockMutation) SetField(name string, value ent.Value) error {
 		m.SetGoodID(v)
 		return nil
 	case stock.FieldTotal:
-		v, ok := value.(int32)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotal(v)
 		return nil
 	case stock.FieldInService:
-		v, ok := value.(int32)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetInService(v)
 		return nil
 	case stock.FieldSold:
-		v, ok := value.(int32)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

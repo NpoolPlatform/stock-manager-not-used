@@ -90,41 +90,41 @@ func (su *StockUpdate) SetGoodID(u uuid.UUID) *StockUpdate {
 }
 
 // SetTotal sets the "total" field.
-func (su *StockUpdate) SetTotal(i int32) *StockUpdate {
+func (su *StockUpdate) SetTotal(u uint32) *StockUpdate {
 	su.mutation.ResetTotal()
-	su.mutation.SetTotal(i)
+	su.mutation.SetTotal(u)
 	return su
 }
 
-// AddTotal adds i to the "total" field.
-func (su *StockUpdate) AddTotal(i int32) *StockUpdate {
-	su.mutation.AddTotal(i)
+// AddTotal adds u to the "total" field.
+func (su *StockUpdate) AddTotal(u int32) *StockUpdate {
+	su.mutation.AddTotal(u)
 	return su
 }
 
 // SetInService sets the "in_service" field.
-func (su *StockUpdate) SetInService(i int32) *StockUpdate {
+func (su *StockUpdate) SetInService(u uint32) *StockUpdate {
 	su.mutation.ResetInService()
-	su.mutation.SetInService(i)
+	su.mutation.SetInService(u)
 	return su
 }
 
-// AddInService adds i to the "in_service" field.
-func (su *StockUpdate) AddInService(i int32) *StockUpdate {
-	su.mutation.AddInService(i)
+// AddInService adds u to the "in_service" field.
+func (su *StockUpdate) AddInService(u int32) *StockUpdate {
+	su.mutation.AddInService(u)
 	return su
 }
 
 // SetSold sets the "sold" field.
-func (su *StockUpdate) SetSold(i int32) *StockUpdate {
+func (su *StockUpdate) SetSold(u uint32) *StockUpdate {
 	su.mutation.ResetSold()
-	su.mutation.SetSold(i)
+	su.mutation.SetSold(u)
 	return su
 }
 
-// AddSold adds i to the "sold" field.
-func (su *StockUpdate) AddSold(i int32) *StockUpdate {
-	su.mutation.AddSold(i)
+// AddSold adds u to the "sold" field.
+func (su *StockUpdate) AddSold(u int32) *StockUpdate {
+	su.mutation.AddSold(u)
 	return su
 }
 
@@ -271,42 +271,42 @@ func (su *StockUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Total(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldTotal,
 		})
 	}
 	if value, ok := su.mutation.AddedTotal(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldTotal,
 		})
 	}
 	if value, ok := su.mutation.InService(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldInService,
 		})
 	}
 	if value, ok := su.mutation.AddedInService(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldInService,
 		})
 	}
 	if value, ok := su.mutation.Sold(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldSold,
 		})
 	}
 	if value, ok := su.mutation.AddedSold(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldSold,
 		})
@@ -392,41 +392,41 @@ func (suo *StockUpdateOne) SetGoodID(u uuid.UUID) *StockUpdateOne {
 }
 
 // SetTotal sets the "total" field.
-func (suo *StockUpdateOne) SetTotal(i int32) *StockUpdateOne {
+func (suo *StockUpdateOne) SetTotal(u uint32) *StockUpdateOne {
 	suo.mutation.ResetTotal()
-	suo.mutation.SetTotal(i)
+	suo.mutation.SetTotal(u)
 	return suo
 }
 
-// AddTotal adds i to the "total" field.
-func (suo *StockUpdateOne) AddTotal(i int32) *StockUpdateOne {
-	suo.mutation.AddTotal(i)
+// AddTotal adds u to the "total" field.
+func (suo *StockUpdateOne) AddTotal(u int32) *StockUpdateOne {
+	suo.mutation.AddTotal(u)
 	return suo
 }
 
 // SetInService sets the "in_service" field.
-func (suo *StockUpdateOne) SetInService(i int32) *StockUpdateOne {
+func (suo *StockUpdateOne) SetInService(u uint32) *StockUpdateOne {
 	suo.mutation.ResetInService()
-	suo.mutation.SetInService(i)
+	suo.mutation.SetInService(u)
 	return suo
 }
 
-// AddInService adds i to the "in_service" field.
-func (suo *StockUpdateOne) AddInService(i int32) *StockUpdateOne {
-	suo.mutation.AddInService(i)
+// AddInService adds u to the "in_service" field.
+func (suo *StockUpdateOne) AddInService(u int32) *StockUpdateOne {
+	suo.mutation.AddInService(u)
 	return suo
 }
 
 // SetSold sets the "sold" field.
-func (suo *StockUpdateOne) SetSold(i int32) *StockUpdateOne {
+func (suo *StockUpdateOne) SetSold(u uint32) *StockUpdateOne {
 	suo.mutation.ResetSold()
-	suo.mutation.SetSold(i)
+	suo.mutation.SetSold(u)
 	return suo
 }
 
-// AddSold adds i to the "sold" field.
-func (suo *StockUpdateOne) AddSold(i int32) *StockUpdateOne {
-	suo.mutation.AddSold(i)
+// AddSold adds u to the "sold" field.
+func (suo *StockUpdateOne) AddSold(u int32) *StockUpdateOne {
+	suo.mutation.AddSold(u)
 	return suo
 }
 
@@ -597,42 +597,42 @@ func (suo *StockUpdateOne) sqlSave(ctx context.Context) (_node *Stock, err error
 	}
 	if value, ok := suo.mutation.Total(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldTotal,
 		})
 	}
 	if value, ok := suo.mutation.AddedTotal(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldTotal,
 		})
 	}
 	if value, ok := suo.mutation.InService(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldInService,
 		})
 	}
 	if value, ok := suo.mutation.AddedInService(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldInService,
 		})
 	}
 	if value, ok := suo.mutation.Sold(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldSold,
 		})
 	}
 	if value, ok := suo.mutation.AddedSold(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldSold,
 		})

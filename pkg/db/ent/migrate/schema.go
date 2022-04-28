@@ -15,9 +15,9 @@ var (
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "good_id", Type: field.TypeUUID},
-		{Name: "total", Type: field.TypeInt32},
-		{Name: "in_service", Type: field.TypeInt32},
-		{Name: "sold", Type: field.TypeInt32},
+		{Name: "total", Type: field.TypeUint32},
+		{Name: "in_service", Type: field.TypeUint32},
+		{Name: "sold", Type: field.TypeUint32},
 	}
 	// StocksTable holds the schema information for the "stocks" table.
 	StocksTable = &schema.Table{

@@ -72,20 +72,20 @@ func (sc *StockCreate) SetGoodID(u uuid.UUID) *StockCreate {
 }
 
 // SetTotal sets the "total" field.
-func (sc *StockCreate) SetTotal(i int32) *StockCreate {
-	sc.mutation.SetTotal(i)
+func (sc *StockCreate) SetTotal(u uint32) *StockCreate {
+	sc.mutation.SetTotal(u)
 	return sc
 }
 
 // SetInService sets the "in_service" field.
-func (sc *StockCreate) SetInService(i int32) *StockCreate {
-	sc.mutation.SetInService(i)
+func (sc *StockCreate) SetInService(u uint32) *StockCreate {
+	sc.mutation.SetInService(u)
 	return sc
 }
 
 // SetSold sets the "sold" field.
-func (sc *StockCreate) SetSold(i int32) *StockCreate {
-	sc.mutation.SetSold(i)
+func (sc *StockCreate) SetSold(u uint32) *StockCreate {
+	sc.mutation.SetSold(u)
 	return sc
 }
 
@@ -301,7 +301,7 @@ func (sc *StockCreate) createSpec() (*Stock, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.Total(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldTotal,
 		})
@@ -309,7 +309,7 @@ func (sc *StockCreate) createSpec() (*Stock, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.InService(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldInService,
 		})
@@ -317,7 +317,7 @@ func (sc *StockCreate) createSpec() (*Stock, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.Sold(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt32,
+			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldSold,
 		})
@@ -444,7 +444,7 @@ func (u *StockUpsert) UpdateGoodID() *StockUpsert {
 }
 
 // SetTotal sets the "total" field.
-func (u *StockUpsert) SetTotal(v int32) *StockUpsert {
+func (u *StockUpsert) SetTotal(v uint32) *StockUpsert {
 	u.Set(stock.FieldTotal, v)
 	return u
 }
@@ -456,13 +456,13 @@ func (u *StockUpsert) UpdateTotal() *StockUpsert {
 }
 
 // AddTotal adds v to the "total" field.
-func (u *StockUpsert) AddTotal(v int32) *StockUpsert {
+func (u *StockUpsert) AddTotal(v uint32) *StockUpsert {
 	u.Add(stock.FieldTotal, v)
 	return u
 }
 
 // SetInService sets the "in_service" field.
-func (u *StockUpsert) SetInService(v int32) *StockUpsert {
+func (u *StockUpsert) SetInService(v uint32) *StockUpsert {
 	u.Set(stock.FieldInService, v)
 	return u
 }
@@ -474,13 +474,13 @@ func (u *StockUpsert) UpdateInService() *StockUpsert {
 }
 
 // AddInService adds v to the "in_service" field.
-func (u *StockUpsert) AddInService(v int32) *StockUpsert {
+func (u *StockUpsert) AddInService(v uint32) *StockUpsert {
 	u.Add(stock.FieldInService, v)
 	return u
 }
 
 // SetSold sets the "sold" field.
-func (u *StockUpsert) SetSold(v int32) *StockUpsert {
+func (u *StockUpsert) SetSold(v uint32) *StockUpsert {
 	u.Set(stock.FieldSold, v)
 	return u
 }
@@ -492,7 +492,7 @@ func (u *StockUpsert) UpdateSold() *StockUpsert {
 }
 
 // AddSold adds v to the "sold" field.
-func (u *StockUpsert) AddSold(v int32) *StockUpsert {
+func (u *StockUpsert) AddSold(v uint32) *StockUpsert {
 	u.Add(stock.FieldSold, v)
 	return u
 }
@@ -625,14 +625,14 @@ func (u *StockUpsertOne) UpdateGoodID() *StockUpsertOne {
 }
 
 // SetTotal sets the "total" field.
-func (u *StockUpsertOne) SetTotal(v int32) *StockUpsertOne {
+func (u *StockUpsertOne) SetTotal(v uint32) *StockUpsertOne {
 	return u.Update(func(s *StockUpsert) {
 		s.SetTotal(v)
 	})
 }
 
 // AddTotal adds v to the "total" field.
-func (u *StockUpsertOne) AddTotal(v int32) *StockUpsertOne {
+func (u *StockUpsertOne) AddTotal(v uint32) *StockUpsertOne {
 	return u.Update(func(s *StockUpsert) {
 		s.AddTotal(v)
 	})
@@ -646,14 +646,14 @@ func (u *StockUpsertOne) UpdateTotal() *StockUpsertOne {
 }
 
 // SetInService sets the "in_service" field.
-func (u *StockUpsertOne) SetInService(v int32) *StockUpsertOne {
+func (u *StockUpsertOne) SetInService(v uint32) *StockUpsertOne {
 	return u.Update(func(s *StockUpsert) {
 		s.SetInService(v)
 	})
 }
 
 // AddInService adds v to the "in_service" field.
-func (u *StockUpsertOne) AddInService(v int32) *StockUpsertOne {
+func (u *StockUpsertOne) AddInService(v uint32) *StockUpsertOne {
 	return u.Update(func(s *StockUpsert) {
 		s.AddInService(v)
 	})
@@ -667,14 +667,14 @@ func (u *StockUpsertOne) UpdateInService() *StockUpsertOne {
 }
 
 // SetSold sets the "sold" field.
-func (u *StockUpsertOne) SetSold(v int32) *StockUpsertOne {
+func (u *StockUpsertOne) SetSold(v uint32) *StockUpsertOne {
 	return u.Update(func(s *StockUpsert) {
 		s.SetSold(v)
 	})
 }
 
 // AddSold adds v to the "sold" field.
-func (u *StockUpsertOne) AddSold(v int32) *StockUpsertOne {
+func (u *StockUpsertOne) AddSold(v uint32) *StockUpsertOne {
 	return u.Update(func(s *StockUpsert) {
 		s.AddSold(v)
 	})
@@ -981,14 +981,14 @@ func (u *StockUpsertBulk) UpdateGoodID() *StockUpsertBulk {
 }
 
 // SetTotal sets the "total" field.
-func (u *StockUpsertBulk) SetTotal(v int32) *StockUpsertBulk {
+func (u *StockUpsertBulk) SetTotal(v uint32) *StockUpsertBulk {
 	return u.Update(func(s *StockUpsert) {
 		s.SetTotal(v)
 	})
 }
 
 // AddTotal adds v to the "total" field.
-func (u *StockUpsertBulk) AddTotal(v int32) *StockUpsertBulk {
+func (u *StockUpsertBulk) AddTotal(v uint32) *StockUpsertBulk {
 	return u.Update(func(s *StockUpsert) {
 		s.AddTotal(v)
 	})
@@ -1002,14 +1002,14 @@ func (u *StockUpsertBulk) UpdateTotal() *StockUpsertBulk {
 }
 
 // SetInService sets the "in_service" field.
-func (u *StockUpsertBulk) SetInService(v int32) *StockUpsertBulk {
+func (u *StockUpsertBulk) SetInService(v uint32) *StockUpsertBulk {
 	return u.Update(func(s *StockUpsert) {
 		s.SetInService(v)
 	})
 }
 
 // AddInService adds v to the "in_service" field.
-func (u *StockUpsertBulk) AddInService(v int32) *StockUpsertBulk {
+func (u *StockUpsertBulk) AddInService(v uint32) *StockUpsertBulk {
 	return u.Update(func(s *StockUpsert) {
 		s.AddInService(v)
 	})
@@ -1023,14 +1023,14 @@ func (u *StockUpsertBulk) UpdateInService() *StockUpsertBulk {
 }
 
 // SetSold sets the "sold" field.
-func (u *StockUpsertBulk) SetSold(v int32) *StockUpsertBulk {
+func (u *StockUpsertBulk) SetSold(v uint32) *StockUpsertBulk {
 	return u.Update(func(s *StockUpsert) {
 		s.SetSold(v)
 	})
 }
 
 // AddSold adds v to the "sold" field.
-func (u *StockUpsertBulk) AddSold(v int32) *StockUpsertBulk {
+func (u *StockUpsertBulk) AddSold(v uint32) *StockUpsertBulk {
 	return u.Update(func(s *StockUpsert) {
 		s.AddSold(v)
 	})

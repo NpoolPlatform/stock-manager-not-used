@@ -24,9 +24,9 @@ func (Stock) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New).Unique(),
 		field.UUID("good_id", uuid.UUID{}),
-		field.Int32("total"),
-		field.Int32("in_service"),
-		field.Int32("sold"),
+		field.Uint32("total"),
+		field.Uint32("in_service"),
+		field.Uint32("sold"),
 	}
 }
 
