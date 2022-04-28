@@ -19,10 +19,10 @@ type Stock struct {
 	tx *ent.Tx
 }
 
-func New(ctx context.Context, tx *ent.Tx) (*Stock, error) {
-	if tx == nil {
+func New(ctx context.Context, _tx *ent.Tx) (*Stock, error) {
+	if _tx == nil {
 		return &Stock{
-			tx: tx,
+			tx: _tx,
 		}, nil
 	}
 
@@ -30,13 +30,13 @@ func New(ctx context.Context, tx *ent.Tx) (*Stock, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fail get db client: %v", err)
 	}
-	tx, err = cli.Tx(ctx)
+	_tx, err = cli.Tx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("fail get client transaction: %v", err)
 	}
 
 	return &Stock{
-		tx: tx,
+		tx: _tx,
 	}, nil
 }
 
@@ -61,6 +61,9 @@ func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 			Save(ctx)
 		return err
 	})
+	if err != nil {
+		return nil, fmt.Errorf("fail create stock: %v", err)
+	}
 
 	return s.rowToObject(info), nil
 }
