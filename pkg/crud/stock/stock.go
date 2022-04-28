@@ -8,6 +8,8 @@ import (
 	"github.com/NpoolPlatform/stock-manager/pkg/db"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent"
 
+	"github.com/NpoolPlatform/stock-manager/pkg/crud/tx"
+
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 
 	"github.com/google/uuid"
@@ -48,14 +50,17 @@ func (s *Stock) rowToObject(row *ent.Stock) *npool.Stock {
 }
 
 func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, error) {
-	info, err := s.tx.Stock.Create().
-		SetGoodID(uuid.MustParse(in.GetGoodID())).
-		SetInService(in.GetInService()).
-		SetSold(in.GetSold()).
-		Save(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("fail create stock: %v", err)
-	}
+	var info *ent.Stock
+	var err error
+
+	err = tx.WithTx(ctx, s.tx, func() error {
+		info, err = s.tx.Stock.Create().
+			SetGoodID(uuid.MustParse(in.GetGoodID())).
+			SetInService(in.GetInService()).
+			SetSold(in.GetSold()).
+			Save(ctx)
+		return err
+	})
 
 	return s.rowToObject(info), nil
 }
