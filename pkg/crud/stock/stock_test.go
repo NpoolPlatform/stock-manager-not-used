@@ -35,8 +35,8 @@ func TestCRUD(t *testing.T) {
 	stock := npool.Stock{
 		GoodID:    uuid.New().String(),
 		Total:     1000,
-		InService: 20,
-		Sold:      10000,
+		InService: 0,
+		Sold:      0,
 	}
 
 	schema, err := New(context.Background(), nil)
@@ -46,5 +46,28 @@ func TestCRUD(t *testing.T) {
 	if assert.Nil(t, err) {
 		assert.NotEqual(t, info.ID, uuid.UUID{}.String())
 		assertStock(t, info, &stock)
+	}
+
+	stock1 := &npool.Stock{
+		GoodID:    uuid.New().String(),
+		Total:     1000,
+		InService: 0,
+		Sold:      0,
+	}
+	stock2 := &npool.Stock{
+		GoodID:    uuid.New().String(),
+		Total:     1000,
+		InService: 0,
+		Sold:      0,
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	infos, err := schema.CreateBulk(context.Background(), []*npool.Stock{stock1, stock2})
+	if assert.Nil(t, err) {
+		assert.Equal(t, len(infos), 2)
+		assert.NotEqual(t, infos[0].ID, uuid.UUID{}.String())
+		assert.NotEqual(t, infos[1].ID, uuid.UUID{}.String())
 	}
 }
