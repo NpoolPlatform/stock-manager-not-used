@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	"github.com/NpoolPlatform/stock-manager/pkg/db"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent"
 
+	"github.com/NpoolPlatform/stock-manager/pkg/crud/entity"
 	"github.com/NpoolPlatform/stock-manager/pkg/crud/tx"
 
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
@@ -16,27 +16,17 @@ import (
 )
 
 type Stock struct {
-	tx *ent.Tx
+	*entity.Entity
 }
 
 func New(ctx context.Context, _tx *ent.Tx) (*Stock, error) {
-	if _tx != nil {
-		return &Stock{
-			tx: _tx,
-		}, nil
-	}
-
-	cli, err := db.Client()
+	e, err := entity.New(ctx, _tx)
 	if err != nil {
-		return nil, fmt.Errorf("fail get db client: %v", err)
-	}
-	_tx, err = cli.Tx(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("fail get client transaction: %v", err)
+		return nil, fmt.Errorf("fail create entity: %v", err)
 	}
 
 	return &Stock{
-		tx: _tx,
+		Entity: e,
 	}, nil
 }
 
@@ -53,8 +43,8 @@ func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 	var info *ent.Stock
 	var err error
 
-	err = tx.WithTx(ctx, s.tx, func() error {
-		info, err = s.tx.Stock.Create().
+	err = tx.WithTx(ctx, s.Tx, func() error {
+		info, err = s.Tx.Stock.Create().
 			SetGoodID(uuid.MustParse(in.GetGoodID())).
 			SetInService(in.GetInService()).
 			SetSold(in.GetSold()).
