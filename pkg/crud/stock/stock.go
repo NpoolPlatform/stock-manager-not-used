@@ -20,7 +20,7 @@ type Stock struct {
 }
 
 func New(ctx context.Context, _tx *ent.Tx) (*Stock, error) {
-	if _tx == nil {
+	if _tx != nil {
 		return &Stock{
 			tx: _tx,
 		}, nil
