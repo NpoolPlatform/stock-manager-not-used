@@ -164,9 +164,6 @@ func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]i
 			return fmt.Errorf("fail update stock: %v", err)
 		}
 
-		fmt.Println(info)
-		fmt.Printf("\n\n\n\n\n\n")
-
 		return nil
 	})
 	if err != nil {
@@ -228,7 +225,7 @@ func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 	return s.rowToObject(info), nil
 }
 
-func (s *Stock) queryFromConds(conds map[string]*cruder.Cond) (*ent.StockQuery, error) {
+func (s *Stock) queryFromConds(conds map[string]*cruder.Cond) (*ent.StockQuery, error) { //nolint
 	stm := s.Tx.Stock.Query()
 	for k, v := range conds {
 		switch k {
@@ -294,9 +291,8 @@ func (s *Stock) queryFromConds(conds map[string]*cruder.Cond) (*ent.StockQuery, 
 func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset, limit int) ([]*npool.Stock, int, error) {
 	rows := []*ent.Stock{}
 	var total int
-	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err := tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		stm, err := s.queryFromConds(conds)
 		if err != nil {
 			return fmt.Errorf("fail construct stm: %v", err)
