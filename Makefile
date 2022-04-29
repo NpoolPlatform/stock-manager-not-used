@@ -57,7 +57,7 @@ gen-ent:
 	go install entgo.io/ent/cmd/ent@latest
 	go get -d github.com/google/uuid@v1.3.0
 	go get -d github.com/NpoolPlatform/libent-cruder
-	go run entgo.io/ent/cmd/ent generate --feature entql,sql/upsert,privacy,schema/snapshot ./pkg/db/ent/schema
+	go run entgo.io/ent/cmd/ent generate --feature entql,sql/upsert,privacy,schema/snapshot,sql/lock ./pkg/db/ent/schema
 
 all: verify-build
 

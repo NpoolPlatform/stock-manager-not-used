@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -25,6 +26,7 @@ type StockQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Stock
+	modifiers  []func(s *sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -333,6 +335,9 @@ func (sq *StockQuery) sqlAll(ctx context.Context) ([]*Stock, error) {
 		node := nodes[len(nodes)-1]
 		return node.assignValues(columns, values)
 	}
+	if len(sq.modifiers) > 0 {
+		_spec.Modifiers = sq.modifiers
+	}
 	if err := sqlgraph.QueryNodes(ctx, sq.driver, _spec); err != nil {
 		return nil, err
 	}
@@ -344,6 +349,9 @@ func (sq *StockQuery) sqlAll(ctx context.Context) ([]*Stock, error) {
 
 func (sq *StockQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := sq.querySpec()
+	if len(sq.modifiers) > 0 {
+		_spec.Modifiers = sq.modifiers
+	}
 	_spec.Node.Columns = sq.fields
 	if len(sq.fields) > 0 {
 		_spec.Unique = sq.unique != nil && *sq.unique
@@ -422,6 +430,9 @@ func (sq *StockQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if sq.unique != nil && *sq.unique {
 		selector.Distinct()
 	}
+	for _, m := range sq.modifiers {
+		m(selector)
+	}
 	for _, p := range sq.predicates {
 		p(selector)
 	}
@@ -437,6 +448,32 @@ func (sq *StockQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// ForUpdate locks the selected rows against concurrent updates, and prevent them from being
+// updated, deleted or "selected ... for update" by other sessions, until the transaction is
+// either committed or rolled-back.
+func (sq *StockQuery) ForUpdate(opts ...sql.LockOption) *StockQuery {
+	if sq.driver.Dialect() == dialect.Postgres {
+		sq.Unique(false)
+	}
+	sq.modifiers = append(sq.modifiers, func(s *sql.Selector) {
+		s.ForUpdate(opts...)
+	})
+	return sq
+}
+
+// ForShare behaves similarly to ForUpdate, except that it acquires a shared mode lock
+// on any rows that are read. Other sessions can read the rows, but cannot modify them
+// until your transaction commits.
+func (sq *StockQuery) ForShare(opts ...sql.LockOption) *StockQuery {
+	if sq.driver.Dialect() == dialect.Postgres {
+		sq.Unique(false)
+	}
+	sq.modifiers = append(sq.modifiers, func(s *sql.Selector) {
+		s.ForShare(opts...)
+	})
+	return sq
 }
 
 // StockGroupBy is the group-by builder for Stock entities.

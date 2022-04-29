@@ -145,3 +145,38 @@ func (s *Server) UpdateStockFields(ctx context.Context, in *npool.UpdateStockFie
 		Info: info,
 	}, nil
 }
+
+func (s *Server) AtomicUpdateStockFields(ctx context.Context, in *npool.AtomicUpdateStockFieldsRequest) (*npool.AtomicUpdateStockFieldsResponse, error) {
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		logger.Sugar().Errorf("invalid stock id: %v", err)
+		return &npool.AtomicUpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	fields, err := stockFieldsToFields(in.GetFields())
+	if err != nil {
+		logger.Sugar().Errorf("invalid stock fields: %v", err)
+		return &npool.AtomicUpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(fields) == 0 {
+		logger.Sugar().Errorf("empty stock fields: %v", err)
+		return &npool.AtomicUpdateStockFieldsResponse{}, status.Error(codes.Internal, "empty stock fields")
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.AtomicUpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err := schema.AtomicUpdateFields(ctx, id, fields)
+	if err != nil {
+		logger.Sugar().Errorf("fail atomic update stock: %v", err)
+		return &npool.AtomicUpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.AtomicUpdateStockFieldsResponse{
+		Info: info,
+	}, nil
+}

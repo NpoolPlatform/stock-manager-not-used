@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"entgo.io/ent/dialect/sql"
+
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent"
+	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
 
 	constant "github.com/NpoolPlatform/stock-manager/pkg/const"
 	"github.com/NpoolPlatform/stock-manager/pkg/crud/entity"
@@ -133,16 +136,41 @@ func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[strin
 	return s.rowToObject(info), nil
 }
 
-func (s *Stock) AtomicInc(ctx context.Context, id uuid.UUID, fields []string) (*npool.Stock, error) {
-	return nil, nil
-}
+func (s *Stock) AtomicUpdateFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
+	var info *ent.Stock
 
-func (s *Stock) AtomicSub(ctx context.Context, id uuid.UUID, fields []string) (*npool.Stock, error) {
-	return nil, nil
-}
+	err := tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		updater, err := s.Tx.Stock.Query().
+			Where(stock.ID((id))).
+			ForUpdate(sql.WithLockAction(sql.NoWait)).
+			Only(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail lock stock: %v", err)
+		}
 
-func (s *Stock) AtomicSet(ctx context.Context, id uuid.UUID, fields map[string]*npool.Stock) (*npool.Stock, error) {
-	return nil, nil
+		myTx := updater.Update()
+		for k, v := range fields {
+			switch k {
+			case constant.StockFieldInService:
+				myTx = myTx.SetInService(v.(uint32))
+			case constant.StockFieldSold:
+				myTx = myTx.SetSold(v.(uint32))
+			default:
+				return fmt.Errorf("invalid stock field")
+			}
+		}
+		info, err = myTx.Save(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail update stock: %v", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail atomic update stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
 }
 
 func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
