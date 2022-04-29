@@ -64,6 +64,14 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
+	info, err = schema.Row(context.Background(), uuid.MustParse(info.ID))
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
 	stock.InService = 2001
 	stock.Sold = 3001
 
@@ -83,11 +91,30 @@ func TestCRUD(t *testing.T) {
 	stock.InService = 2002
 	stock.Sold = 3002
 
-	info, err = schema.AtomicUpdateFields(context.Background(),
+	info, err = schema.AddFields(context.Background(),
 		uuid.MustParse(info.ID),
 		map[string]interface{}{
-			constant.StockFieldInService: stock.InService,
-			constant.StockFieldSold:      stock.Sold,
+			constant.StockFieldInService: 1,
+			constant.StockFieldSold:      1,
+		})
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
+	assert.Nil(t, err)
+	assert.NotNil(t, info)
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	stock.InService = 2001
+	stock.Sold = 3001
+
+	info, err = schema.SubFields(context.Background(),
+		uuid.MustParse(info.ID),
+		map[string]interface{}{
+			constant.StockFieldInService: 1,
+			constant.StockFieldSold:      1,
 		})
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, &stock)

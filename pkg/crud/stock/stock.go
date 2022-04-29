@@ -136,29 +136,68 @@ func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[strin
 	return s.rowToObject(info), nil
 }
 
-func (s *Stock) AtomicUpdateFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
+func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
 	var info *ent.Stock
+	var err error
 
-	err := tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		updater, err := s.Tx.Stock.Query().
-			Where(stock.ID((id))).
-			ForUpdate( /* sql.WithLockAction(sql.NoWait) */ ). //nolint
-			Only(_ctx)
-		if err != nil {
-			return fmt.Errorf("fail lock stock: %v", err)
-		}
-
-		myTx := updater.Update()
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		myTx := s.Tx.Stock.UpdateOneID(id)
 		for k, v := range fields {
+			increment, err := cruder.AnyTypeInt32(v)
+			if err != nil {
+				return fmt.Errorf("invalid value type: %v", err)
+			}
+
 			switch k {
 			case constant.StockFieldInService:
-				myTx = myTx.SetInService(v.(uint32))
+				myTx = myTx.AddInService(increment)
 			case constant.StockFieldSold:
-				myTx = myTx.SetSold(v.(uint32))
+				myTx = myTx.AddSold(increment)
 			default:
 				return fmt.Errorf("invalid stock field")
 			}
 		}
+
+		info, err = myTx.Save(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail update stock: %v", err)
+		}
+
+		fmt.Println(info)
+		fmt.Printf("\n\n\n\n\n\n")
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail add stock fields: %v", err)
+	}
+
+	return s.rowToObject(info), nil
+}
+
+func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
+	var info *ent.Stock
+	var err error
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		myTx := s.Tx.Stock.UpdateOneID(id)
+		for k, v := range fields {
+			increment, err := cruder.AnyTypeInt32(v)
+			if err != nil {
+				return fmt.Errorf("invalid value type: %v", err)
+			}
+			increment *= -1
+
+			switch k {
+			case constant.StockFieldInService:
+				myTx = myTx.AddInService(increment)
+			case constant.StockFieldSold:
+				myTx = myTx.AddSold(increment)
+			default:
+				return fmt.Errorf("invalid stock field")
+			}
+		}
+
 		info, err = myTx.Save(_ctx)
 		if err != nil {
 			return fmt.Errorf("fail update stock: %v", err)
@@ -174,7 +213,18 @@ func (s *Stock) AtomicUpdateFields(ctx context.Context, id uuid.UUID, fields map
 }
 
 func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
-	return nil, nil
+	var info *ent.Stock
+	var err error
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		info, err = s.Tx.Stock.Query().Where(stock.ID(id)).Only(_ctx)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail get stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
 }
 
 func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset, limit uint32) ([]*npool.Stock, error) {
@@ -190,7 +240,7 @@ func (s *Stock) Exist(ctx context.Context, id uuid.UUID) (bool, error) {
 	exist := false
 
 	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		exist, err = s.Tx.Stock.Query().Where(stock.IDEQ(id)).Exist(_ctx)
+		exist, err = s.Tx.Stock.Query().Where(stock.ID(id)).Exist(_ctx)
 		return err
 	})
 	if err != nil {
