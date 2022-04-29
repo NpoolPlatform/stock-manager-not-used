@@ -117,7 +117,7 @@ func (s *Server) UpdateStockFields(ctx context.Context, in *npool.UpdateStockFie
 		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	_, err := stockFieldsToFields(in.GetFields())
+	fields, err := stockFieldsToFields(in.GetFields())
 	if err != nil {
 		logger.Sugar().Errorf("invalid stock fields: %v", err)
 		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
