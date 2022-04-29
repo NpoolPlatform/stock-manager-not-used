@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"entgo.io/ent/dialect/sql"
+	_ "entgo.io/ent/dialect/sql" //nolint
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent"
@@ -142,7 +142,7 @@ func (s *Stock) AtomicUpdateFields(ctx context.Context, id uuid.UUID, fields map
 	err := tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		updater, err := s.Tx.Stock.Query().
 			Where(stock.ID((id))).
-			ForUpdate(sql.WithLockAction(sql.NoWait)).
+			ForUpdate( /* sql.WithLockAction(sql.NoWait) */ ). //nolint
 			Only(_ctx)
 		if err != nil {
 			return fmt.Errorf("fail lock stock: %v", err)
