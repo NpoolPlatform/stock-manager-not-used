@@ -4,16 +4,16 @@ package api
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
-	// constant "github.com/NpoolPlatform/stock-manager/pkg/const"
+	constant "github.com/NpoolPlatform/stock-manager/pkg/const"
 	crud "github.com/NpoolPlatform/stock-manager/pkg/crud/stock"
 
 	"github.com/google/uuid"
 
-	// "github.com/golang/protobuf/ptypes/any"
-	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -95,8 +95,20 @@ func (s *Server) UpdateStock(ctx context.Context, in *npool.UpdateStockRequest) 
 	}, nil
 }
 
-func stockFieldsToFields(fields map[string]*anypb.Any) (map[string]interface{}, error) {
-	return nil, nil
+func stockFieldsToFields(fields map[string]*structpb.Value) (map[string]interface{}, error) {
+	newFields := map[string]interface{}{}
+
+	for k, v := range fields {
+		switch k {
+		case constant.StockFieldInService:
+			newFields[k] = v.GetNumberValue()
+		case constant.StockFieldSold:
+			newFields[k] = v.GetNumberValue()
+		default:
+			return nil, fmt.Errorf("invalid stock field")
+		}
+	}
+	return newFields, nil
 }
 
 func (s *Server) UpdateStockFields(ctx context.Context, in *npool.UpdateStockFieldsRequest) (*npool.UpdateStockFieldsResponse, error) {
