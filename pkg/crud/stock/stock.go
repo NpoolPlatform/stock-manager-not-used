@@ -227,69 +227,78 @@ func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 	return s.rowToObject(info), nil
 }
 
+func (s *Stock) queryFromConds(conds map[string]*cruder.Cond) (*ent.StockQuery, error) {
+	stm := s.Tx.Stock.Query()
+	for k, v := range conds {
+		switch k {
+		case constant.FieldID:
+			id, err := cruder.AnyTypeUUID(v.Val)
+			if err != nil {
+				return nil, fmt.Errorf("invalid id: %v", err)
+			}
+			stm = stm.Where(stock.ID(id))
+		case constant.StockFieldGoodID:
+			id, err := cruder.AnyTypeUUID(v.Val)
+			if err != nil {
+				return nil, fmt.Errorf("invalid good id: %v", err)
+			}
+			stm = stm.Where(stock.GoodID(id))
+		case constant.StockFieldTotal:
+			value, err := cruder.AnyTypeUint32(v.Val)
+			if err != nil {
+				return nil, fmt.Errorf("invalid total value: %v", err)
+			}
+			switch v.Op {
+			case cruder.EQ:
+				stm = stm.Where(stock.TotalEQ(value))
+			case cruder.GT:
+				stm = stm.Where(stock.TotalGT(value))
+			case cruder.LT:
+				stm = stm.Where(stock.TotalLT(value))
+			}
+		case constant.StockFieldInService:
+			value, err := cruder.AnyTypeUint32(v.Val)
+			if err != nil {
+				return nil, fmt.Errorf("invalid value type: %v", err)
+			}
+			switch v.Op {
+			case cruder.EQ:
+				stm = stm.Where(stock.InServiceEQ(value))
+			case cruder.GT:
+				stm = stm.Where(stock.InServiceGT(value))
+			case cruder.LT:
+				stm = stm.Where(stock.InServiceLT(value))
+			}
+		case constant.StockFieldSold:
+			value, err := cruder.AnyTypeUint32(v.Val)
+			if err != nil {
+				return nil, fmt.Errorf("invalid value type: %v", err)
+			}
+			switch v.Op {
+			case cruder.EQ:
+				stm = stm.Where(stock.SoldEQ(value))
+			case cruder.GT:
+				stm = stm.Where(stock.SoldGT(value))
+			case cruder.LT:
+				stm = stm.Where(stock.SoldLT(value))
+			}
+		default:
+			return nil, fmt.Errorf("invalid stock field")
+		}
+	}
+
+	return stm, nil
+}
+
 func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset, limit int) ([]*npool.Stock, int, error) {
 	rows := []*ent.Stock{}
 	var total int
 	var err error
 
 	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		stm := s.Tx.Stock.Query()
-		for k, v := range conds {
-			switch k {
-			case constant.FieldID:
-				id, err := cruder.AnyTypeUUID(v.Val)
-				if err != nil {
-					return fmt.Errorf("invalid id: %v", err)
-				}
-				stm = stm.Where(stock.ID(id))
-			case constant.StockFieldGoodID:
-				id, err := cruder.AnyTypeUUID(v.Val)
-				if err != nil {
-					return fmt.Errorf("invalid good id: %v", err)
-				}
-				stm = stm.Where(stock.GoodID(id))
-			case constant.StockFieldTotal:
-				value, err := cruder.AnyTypeUint32(v.Val)
-				if err != nil {
-					return fmt.Errorf("invalid total value: %v", err)
-				}
-				switch v.Op {
-				case cruder.EQ:
-					stm = stm.Where(stock.TotalEQ(value))
-				case cruder.GT:
-					stm = stm.Where(stock.TotalGT(value))
-				case cruder.LT:
-					stm = stm.Where(stock.TotalLT(value))
-				}
-			case constant.StockFieldInService:
-				value, err := cruder.AnyTypeUint32(v.Val)
-				if err != nil {
-					return fmt.Errorf("invalid value type: %v", err)
-				}
-				switch v.Op {
-				case cruder.EQ:
-					stm = stm.Where(stock.InServiceEQ(value))
-				case cruder.GT:
-					stm = stm.Where(stock.InServiceGT(value))
-				case cruder.LT:
-					stm = stm.Where(stock.InServiceLT(value))
-				}
-			case constant.StockFieldSold:
-				value, err := cruder.AnyTypeUint32(v.Val)
-				if err != nil {
-					return fmt.Errorf("invalid value type: %v", err)
-				}
-				switch v.Op {
-				case cruder.EQ:
-					stm = stm.Where(stock.SoldEQ(value))
-				case cruder.GT:
-					stm = stm.Where(stock.SoldGT(value))
-				case cruder.LT:
-					stm = stm.Where(stock.SoldLT(value))
-				}
-			default:
-				return fmt.Errorf("invalid stock field")
-			}
+		stm, err := s.queryFromConds(conds)
+		if err != nil {
+			return fmt.Errorf("fail construct stm: %v", err)
 		}
 
 		total, err = stm.Count(_ctx)
@@ -336,7 +345,27 @@ func (s *Stock) Exist(ctx context.Context, id uuid.UUID) (bool, error) {
 }
 
 func (s *Stock) ExistConds(ctx context.Context, conds map[string]*cruder.Cond) (bool, error) {
-	return false, nil
+	var err error
+	exist := false
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		stm, err := s.queryFromConds(conds)
+		if err != nil {
+			return fmt.Errorf("fail construct stm: %v", err)
+		}
+
+		exist, err = stm.Exist(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail check stocks: %v", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return false, fmt.Errorf("fail check stocks: %v", err)
+	}
+
+	return exist, nil
 }
 
 func (s *Stock) Delete(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {

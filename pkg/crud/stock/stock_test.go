@@ -87,6 +87,19 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
+	exist, err := schema.ExistConds(context.Background(), map[string]*cruder.Cond{
+		constant.FieldID: {
+			Op:  cruder.EQ,
+			Val: info.ID,
+		},
+	})
+	if assert.Nil(t, err) {
+		assert.Equal(t, exist, true)
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
 	stock.InService = 2001
 	stock.Sold = 3001
 
