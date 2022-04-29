@@ -77,6 +77,22 @@ func TestCRUD(t *testing.T) {
 		assert.Equal(t, info, &stock)
 	}
 
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	stock.InService = 2002
+	stock.Sold = 3002
+
+	info, err = schema.AtomicUpdateFields(context.Background(),
+		uuid.MustParse(info.ID),
+		map[string]interface{}{
+			constant.StockFieldInService: stock.InService,
+			constant.StockFieldSold:      stock.Sold,
+		})
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
 	stock1 := &npool.Stock{
 		GoodID:    uuid.New().String(),
 		Total:     1000,
