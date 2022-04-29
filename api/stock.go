@@ -7,9 +7,13 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
+	// constant "github.com/NpoolPlatform/stock-manager/pkg/const"
 	crud "github.com/NpoolPlatform/stock-manager/pkg/crud/stock"
 
 	"github.com/google/uuid"
+
+	// "github.com/golang/protobuf/ptypes/any"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -89,4 +93,23 @@ func (s *Server) UpdateStock(ctx context.Context, in *npool.UpdateStockRequest) 
 	return &npool.UpdateStockResponse{
 		Info: info,
 	}, nil
+}
+
+func stockFieldsToFields(fields map[string]*anypb.Any) (map[string]interface{}, error) {
+	return nil, nil
+}
+
+func (s *Server) UpdateStockFields(ctx context.Context, in *npool.UpdateStockFieldsRequest) (*npool.UpdateStockFieldsResponse, error) {
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorf("invalid stock id: %v", err)
+		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	_, err := stockFieldsToFields(in.GetFields())
+	if err != nil {
+		logger.Sugar().Errorf("invalid stock fields: %v", err)
+		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return nil, nil
 }
