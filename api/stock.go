@@ -80,7 +80,7 @@ func (s *Server) UpdateStock(ctx context.Context, in *npool.UpdateStockRequest) 
 
 	schema, err := crud.New(ctx, nil)
 	if err != nil {
-		logger.Sugar().Errorf("fail update schema entity: %v", err)
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
 		return &npool.UpdateStockResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
@@ -112,7 +112,8 @@ func stockFieldsToFields(fields map[string]*structpb.Value) (map[string]interfac
 }
 
 func (s *Server) UpdateStockFields(ctx context.Context, in *npool.UpdateStockFieldsRequest) (*npool.UpdateStockFieldsResponse, error) {
-	if _, err := uuid.Parse(in.GetID()); err != nil {
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
 		logger.Sugar().Errorf("invalid stock id: %v", err)
 		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -123,5 +124,19 @@ func (s *Server) UpdateStockFields(ctx context.Context, in *npool.UpdateStockFie
 		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return nil, nil
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err := schema.UpdateFields(ctx, id, fields)
+	if err != nil {
+		logger.Sugar().Errorf("fail update stock: %v", err)
+		return &npool.UpdateStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.UpdateStockFieldsResponse{
+		Info: info,
+	}, nil
 }

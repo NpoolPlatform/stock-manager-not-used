@@ -106,23 +106,23 @@ func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 	return s.rowToObject(info), nil
 }
 
-func (s *Stock) UpdateFields(ctx context.Context, id string, fields map[string]*npool.Stock) (*npool.Stock, error) {
+func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
 	return nil, nil
 }
 
-func (s *Stock) AtomicInc(ctx context.Context, id string, fields []string) (*npool.Stock, error) {
+func (s *Stock) AtomicInc(ctx context.Context, id uuid.UUID, fields []string) (*npool.Stock, error) {
 	return nil, nil
 }
 
-func (s *Stock) AtomicSub(ctx context.Context, id string, fields []string) (*npool.Stock, error) {
+func (s *Stock) AtomicSub(ctx context.Context, id uuid.UUID, fields []string) (*npool.Stock, error) {
 	return nil, nil
 }
 
-func (s *Stock) AtomicSet(ctx context.Context, id string, fields map[string]*npool.Stock) (*npool.Stock, error) {
+func (s *Stock) AtomicSet(ctx context.Context, id uuid.UUID, fields map[string]*npool.Stock) (*npool.Stock, error) {
 	return nil, nil
 }
 
-func (s *Stock) Row(ctx context.Context, id string) (*npool.Stock, error) {
+func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 	return nil, nil
 }
 
@@ -138,6 +138,6 @@ func (s *Stock) Exist(ctx context.Context, conds map[string]cruder.Cond) (bool, 
 	return false, nil
 }
 
-func (s *Stock) Delete(ctx context.Context, id string) (*npool.Stock, error) {
+func (s *Stock) Delete(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 	return nil, nil
 }
