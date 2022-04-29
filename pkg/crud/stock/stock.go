@@ -185,6 +185,10 @@ func (s *Stock) Count(ctx context.Context, conds map[string]*cruder.Cond) (uint3
 	return 0, nil
 }
 
+func (s *Stock) Exist(ctx context.Context, id uuid.UUID) (bool, error) {
+	return false, nil
+}
+
 func (s *Stock) ExistConds(ctx context.Context, conds map[string]*cruder.Cond) (bool, error) {
 	return false, nil
 }

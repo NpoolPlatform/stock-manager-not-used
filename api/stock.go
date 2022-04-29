@@ -229,6 +229,29 @@ func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (map[string]*cr
 	return newConds, nil
 }
 
+func (s *Server) ExistStock(ctx context.Context, in *npool.ExistStockRequest) (*npool.ExistStockResponse, error) {
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		return &npool.ExistStockResponse{}, fmt.Errorf("invalid stock id: %v", err)
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.ExistStockResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	exist, err := schema.Exist(ctx, id)
+	if err != nil {
+		logger.Sugar().Errorf("fail check stock: %v", err)
+		return &npool.ExistStockResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.ExistStockResponse{
+		Result: exist,
+	}, nil
+}
+
 func (s *Server) ExistStockConds(ctx context.Context, in *npool.ExistStockCondsRequest) (*npool.ExistStockCondsResponse, error) {
 	conds, err := stockCondsToConds(in.GetConds())
 	if err != nil {
