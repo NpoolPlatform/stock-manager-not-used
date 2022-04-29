@@ -3,6 +3,7 @@ package stock
 import (
 	"context"
 	"fmt"
+	"time"
 
 	_ "entgo.io/ent/dialect/sql" //nolint
 
@@ -326,7 +327,27 @@ func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset,
 }
 
 func (s *Stock) Count(ctx context.Context, conds map[string]*cruder.Cond) (uint32, error) {
-	return 0, nil
+	var err error
+	var total int
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		stm, err := s.queryFromConds(conds)
+		if err != nil {
+			return fmt.Errorf("fail construct stm: %v", err)
+		}
+
+		total, err = stm.Count(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail check stocks: %v", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return 0, fmt.Errorf("fail count stocks: %v", err)
+	}
+
+	return uint32(total), nil
 }
 
 func (s *Stock) Exist(ctx context.Context, id uuid.UUID) (bool, error) {
@@ -369,5 +390,18 @@ func (s *Stock) ExistConds(ctx context.Context, conds map[string]*cruder.Cond) (
 }
 
 func (s *Stock) Delete(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
-	return nil, nil
+	var info *ent.Stock
+	var err error
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		info, err = s.Tx.Stock.UpdateOneID(id).
+			SetDeletedAt(uint32(time.Now().Unix())).
+			Save(_ctx)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail delete stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
 }

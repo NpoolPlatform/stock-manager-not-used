@@ -170,4 +170,44 @@ func TestCRUD(t *testing.T) {
 		assert.NotEqual(t, infos[0].ID, uuid.UUID{}.String())
 		assert.NotEqual(t, infos[1].ID, uuid.UUID{}.String())
 	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	count, err := schema.Count(context.Background(), map[string]*cruder.Cond{
+		constant.FieldID: {
+			Op:  cruder.EQ,
+			Val: info.ID,
+		},
+	})
+	if assert.Nil(t, err) {
+		assert.Equal(t, count, uint32(1))
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	info, err = schema.Delete(context.Background(), uuid.MustParse(info.ID))
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	count, err = schema.Count(context.Background(), map[string]*cruder.Cond{
+		constant.FieldID: {
+			Op:  cruder.EQ,
+			Val: info.ID,
+		},
+	})
+	if assert.Nil(t, err) {
+		assert.Equal(t, count, uint32(0))
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	_, err = schema.Row(context.Background(), uuid.MustParse(info.ID))
+	assert.NotNil(t, err)
 }

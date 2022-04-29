@@ -368,3 +368,55 @@ func (s *Server) ExistStockConds(ctx context.Context, in *npool.ExistStockCondsR
 		Result: exist,
 	}, nil
 }
+
+func (s *Server) CountStocks(ctx context.Context, in *npool.CountStocksRequest) (*npool.CountStocksResponse, error) {
+	conds, err := stockCondsToConds(in.GetConds())
+	if err != nil {
+		logger.Sugar().Errorf("invalid stock fields: %v", err)
+		return &npool.CountStocksResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(conds) == 0 {
+		logger.Sugar().Errorf("empty stock fields: %v", err)
+		return &npool.CountStocksResponse{}, status.Error(codes.Internal, "empty stock fields")
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.CountStocksResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	total, err := schema.Count(ctx, conds)
+	if err != nil {
+		logger.Sugar().Errorf("fail count stocks: %v", err)
+		return &npool.CountStocksResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.CountStocksResponse{
+		Result: total,
+	}, nil
+}
+
+func (s *Server) DeleteStock(ctx context.Context, in *npool.DeleteStockRequest) (*npool.DeleteStockResponse, error) {
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		return &npool.DeleteStockResponse{}, fmt.Errorf("invalid stock id: %v", err)
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.DeleteStockResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err := schema.Delete(ctx, id)
+	if err != nil {
+		logger.Sugar().Errorf("fail delete stock: %v", err)
+		return &npool.DeleteStockResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.DeleteStockResponse{
+		Info: info,
+	}, nil
+}
