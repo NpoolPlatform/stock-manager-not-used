@@ -10,6 +10,8 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 	"github.com/NpoolPlatform/stock-manager/pkg/test-init" //nolint
 
+	constant "github.com/NpoolPlatform/stock-manager/pkg/const"
+
 	"github.com/google/uuid"
 
 	"github.com/stretchr/testify/assert"
@@ -55,6 +57,22 @@ func TestCRUD(t *testing.T) {
 	assert.Nil(t, err)
 
 	info, err = schema.Update(context.Background(), &stock)
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	stock.InService = 2001
+	stock.Sold = 3001
+
+	info, err = schema.UpdateFields(context.Background(),
+		uuid.MustParse(info.ID),
+		map[string]interface{}{
+			constant.StockFieldInService: stock.InService,
+			constant.StockFieldSold:      stock.Sold,
+		})
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, &stock)
 	}

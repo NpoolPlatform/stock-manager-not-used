@@ -101,9 +101,9 @@ func stockFieldsToFields(fields map[string]*structpb.Value) (map[string]interfac
 	for k, v := range fields {
 		switch k {
 		case constant.StockFieldInService:
-			newFields[k] = v.GetNumberValue()
+			newFields[k] = uint32(v.GetNumberValue())
 		case constant.StockFieldSold:
-			newFields[k] = v.GetNumberValue()
+			newFields[k] = uint32(v.GetNumberValue())
 		default:
 			return nil, fmt.Errorf("invalid stock field")
 		}

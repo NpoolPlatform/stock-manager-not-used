@@ -7,6 +7,7 @@ import (
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent"
 
+	constant "github.com/NpoolPlatform/stock-manager/pkg/const"
 	"github.com/NpoolPlatform/stock-manager/pkg/crud/entity"
 	"github.com/NpoolPlatform/stock-manager/pkg/crud/tx"
 
@@ -107,7 +108,29 @@ func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 }
 
 func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
-	return nil, nil
+	var info *ent.Stock
+	var err error
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		myTx := s.Tx.Stock.UpdateOneID(id)
+		for k, v := range fields {
+			switch k {
+			case constant.StockFieldInService:
+				myTx = myTx.SetInService(v.(uint32))
+			case constant.StockFieldSold:
+				myTx = myTx.SetSold(v.(uint32))
+			default:
+				return fmt.Errorf("invalid stock field")
+			}
+		}
+		info, err = myTx.Save(_ctx)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail update stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
 }
 
 func (s *Stock) AtomicInc(ctx context.Context, id uuid.UUID, fields []string) (*npool.Stock, error) {
