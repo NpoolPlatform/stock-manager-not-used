@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"testing"
 
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 	"github.com/NpoolPlatform/stock-manager/pkg/test-init" //nolint
 
@@ -67,6 +68,20 @@ func TestCRUD(t *testing.T) {
 	info, err = schema.Row(context.Background(), uuid.MustParse(info.ID))
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, &stock)
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
+	infos, total, err := schema.Rows(context.Background(), map[string]*cruder.Cond{
+		constant.FieldID: {
+			Op:  cruder.EQ,
+			Val: info.ID,
+		},
+	}, 0, 0)
+	if assert.Nil(t, err) {
+		assert.Equal(t, total, 1)
+		assert.Equal(t, infos[0], &stock)
 	}
 
 	schema, err = New(context.Background(), nil)
@@ -136,7 +151,7 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
-	infos, err := schema.CreateBulk(context.Background(), []*npool.Stock{stock1, stock2})
+	infos, err = schema.CreateBulk(context.Background(), []*npool.Stock{stock1, stock2})
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 2)
 		assert.NotEqual(t, infos[0].ID, uuid.UUID{}.String())

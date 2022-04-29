@@ -264,6 +264,59 @@ func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (map[string]*cr
 	return newConds, nil
 }
 
+func (s *Server) GetStock(ctx context.Context, in *npool.GetStockRequest) (*npool.GetStockResponse, error) {
+	id, err := uuid.Parse(in.GetID())
+	if err != nil {
+		return &npool.GetStockResponse{}, fmt.Errorf("invalid stock id: %v", err)
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.GetStockResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err := schema.Row(ctx, id)
+	if err != nil {
+		logger.Sugar().Errorf("fail get stock: %v", err)
+		return &npool.GetStockResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetStockResponse{
+		Info: info,
+	}, nil
+}
+
+func (s *Server) GetStocks(ctx context.Context, in *npool.GetStocksRequest) (*npool.GetStocksResponse, error) {
+	conds, err := stockCondsToConds(in.GetConds())
+	if err != nil {
+		logger.Sugar().Errorf("invalid stock fields: %v", err)
+		return &npool.GetStocksResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(conds) == 0 {
+		logger.Sugar().Errorf("empty stock fields: %v", err)
+		return &npool.GetStocksResponse{}, status.Error(codes.Internal, "empty stock fields")
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.GetStocksResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	infos, total, err := schema.Rows(ctx, conds, int(in.GetOffset()), int(in.GetLimit()))
+	if err != nil {
+		logger.Sugar().Errorf("fail get stocks: %v", err)
+		return &npool.GetStocksResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetStocksResponse{
+		Infos: infos,
+		Total: int32(total),
+	}, nil
+}
+
 func (s *Server) ExistStock(ctx context.Context, in *npool.ExistStockRequest) (*npool.ExistStockResponse, error) {
 	id, err := uuid.Parse(in.GetID())
 	if err != nil {
