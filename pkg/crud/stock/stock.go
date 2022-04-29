@@ -177,15 +177,15 @@ func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 	return nil, nil
 }
 
-func (s *Stock) Rows(ctx context.Context, conds map[string]cruder.Cond, offset, limit uint32) ([]*npool.Stock, error) {
+func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset, limit uint32) ([]*npool.Stock, error) {
 	return nil, nil
 }
 
-func (s *Stock) Count(ctx context.Context, conds map[string]cruder.Cond) (uint32, error) {
+func (s *Stock) Count(ctx context.Context, conds map[string]*cruder.Cond) (uint32, error) {
 	return 0, nil
 }
 
-func (s *Stock) Exist(ctx context.Context, conds map[string]cruder.Cond) (bool, error) {
+func (s *Stock) ExistConds(ctx context.Context, conds map[string]*cruder.Cond) (bool, error) {
 	return false, nil
 }
 

@@ -7,9 +7,13 @@ import (
 	"fmt"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 	constant "github.com/NpoolPlatform/stock-manager/pkg/const"
 	crud "github.com/NpoolPlatform/stock-manager/pkg/crud/stock"
+
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+
+	npoolcommon "github.com/NpoolPlatform/message/npool"
+	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 
 	"github.com/google/uuid"
 
@@ -100,6 +104,12 @@ func stockFieldsToFields(fields map[string]*structpb.Value) (map[string]interfac
 
 	for k, v := range fields {
 		switch k {
+		case constant.FieldID:
+			newFields[k] = v.GetStringValue()
+		case constant.StockFieldGoodID:
+			newFields[k] = v.GetStringValue()
+		case constant.StockFieldTotal:
+			newFields[k] = uint32(v.GetNumberValue())
 		case constant.StockFieldInService:
 			newFields[k] = uint32(v.GetNumberValue())
 		case constant.StockFieldSold:
@@ -178,5 +188,72 @@ func (s *Server) AtomicUpdateStockFields(ctx context.Context, in *npool.AtomicUp
 
 	return &npool.AtomicUpdateStockFieldsResponse{
 		Info: info,
+	}, nil
+}
+
+func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (map[string]*cruder.Cond, error) {
+	newConds := map[string]*cruder.Cond{}
+
+	for k, v := range conds {
+		switch v.Op {
+		case cruder.EQ:
+		case cruder.GT:
+		case cruder.LT:
+		case cruder.LIKE:
+		default:
+			return nil, fmt.Errorf("invalid filter condition op")
+		}
+
+		switch k {
+		case constant.FieldID:
+			fallthrough //nolint
+		case constant.StockFieldGoodID:
+			newConds[k] = &cruder.Cond{
+				Op:  v.Op,
+				Val: v.Val.GetStringValue(),
+			}
+		case constant.StockFieldTotal:
+			fallthrough //nolint
+		case constant.StockFieldInService:
+			fallthrough //nolint
+		case constant.StockFieldSold:
+			newConds[k] = &cruder.Cond{
+				Op:  v.Op,
+				Val: v.Val.GetNumberValue(),
+			}
+		default:
+			return nil, fmt.Errorf("invalid stock field")
+		}
+	}
+
+	return newConds, nil
+}
+
+func (s *Server) ExistStockConds(ctx context.Context, in *npool.ExistStockCondsRequest) (*npool.ExistStockCondsResponse, error) {
+	conds, err := stockCondsToConds(in.GetConds())
+	if err != nil {
+		logger.Sugar().Errorf("invalid stock fields: %v", err)
+		return &npool.ExistStockCondsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(conds) == 0 {
+		logger.Sugar().Errorf("empty stock fields: %v", err)
+		return &npool.ExistStockCondsResponse{}, status.Error(codes.Internal, "empty stock fields")
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.ExistStockCondsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	exist, err := schema.ExistConds(ctx, conds)
+	if err != nil {
+		logger.Sugar().Errorf("fail check stock: %v", err)
+		return &npool.ExistStockCondsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.ExistStockCondsResponse{
+		Result: exist,
 	}, nil
 }
