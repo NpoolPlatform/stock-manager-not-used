@@ -186,7 +186,18 @@ func (s *Stock) Count(ctx context.Context, conds map[string]*cruder.Cond) (uint3
 }
 
 func (s *Stock) Exist(ctx context.Context, id uuid.UUID) (bool, error) {
-	return false, nil
+	var err error
+	exist := false
+
+	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		exist, err = s.Tx.Stock.Query().Where(stock.IDEQ(id)).Exist(_ctx)
+		return err
+	})
+	if err != nil {
+		return false, fmt.Errorf("fail check stock: %v", err)
+	}
+
+	return exist, nil
 }
 
 func (s *Stock) ExistConds(ctx context.Context, conds map[string]*cruder.Cond) (bool, error) {
