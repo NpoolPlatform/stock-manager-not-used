@@ -40,6 +40,7 @@ func (s *Stock) rowToObject(row *ent.Stock) *npool.Stock {
 		ID:        row.ID.String(),
 		GoodID:    row.GoodID.String(),
 		Total:     row.Total,
+		Locked:    row.Locked,
 		InService: row.InService,
 		Sold:      row.Sold,
 	}
@@ -53,6 +54,7 @@ func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 		info, err = s.Tx.Stock.Create().
 			SetGoodID(uuid.MustParse(in.GetGoodID())).
 			SetTotal(in.GetTotal()).
+			SetLocked(0).
 			SetInService(0).
 			SetSold(0).
 			Save(_ctx)
@@ -75,6 +77,7 @@ func (s *Stock) CreateBulk(ctx context.Context, in []*npool.Stock) ([]*npool.Sto
 			bulk[i] = s.Tx.Stock.Create().
 				SetGoodID(uuid.MustParse(info.GetGoodID())).
 				SetTotal(info.GetTotal()).
+				SetLocked(0).
 				SetInService(0).
 				SetSold(0)
 		}
@@ -99,6 +102,7 @@ func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 
 	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		info, err = s.Tx.Stock.UpdateOneID(uuid.MustParse(in.GetID())).
+			SetLocked(in.GetLocked()).
 			SetInService(in.GetInService()).
 			SetSold(in.GetSold()).
 			Save(_ctx)
@@ -116,18 +120,20 @@ func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[strin
 	var err error
 
 	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		myTx := s.Tx.Stock.UpdateOneID(id)
+		stm := s.Tx.Stock.UpdateOneID(id)
 		for k, v := range fields {
 			switch k {
+			case constant.StockFieldLocked:
+				stm = stm.SetLocked(v.(uint32))
 			case constant.StockFieldInService:
-				myTx = myTx.SetInService(v.(uint32))
+				stm = stm.SetInService(v.(uint32))
 			case constant.StockFieldSold:
-				myTx = myTx.SetSold(v.(uint32))
+				stm = stm.SetSold(v.(uint32))
 			default:
 				return fmt.Errorf("invalid stock field")
 			}
 		}
-		info, err = myTx.Save(_ctx)
+		info, err = stm.Save(_ctx)
 		return err
 	})
 	if err != nil {
@@ -142,7 +148,7 @@ func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]i
 	var err error
 
 	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		myTx := s.Tx.Stock.UpdateOneID(id)
+		stm := s.Tx.Stock.UpdateOneID(id)
 		for k, v := range fields {
 			increment, err := cruder.AnyTypeInt32(v)
 			if err != nil {
@@ -150,16 +156,18 @@ func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]i
 			}
 
 			switch k {
+			case constant.StockFieldLocked:
+				stm = stm.AddLocked(increment)
 			case constant.StockFieldInService:
-				myTx = myTx.AddInService(increment)
+				stm = stm.AddInService(increment)
 			case constant.StockFieldSold:
-				myTx = myTx.AddSold(increment)
+				stm = stm.AddSold(increment)
 			default:
 				return fmt.Errorf("invalid stock field")
 			}
 		}
 
-		info, err = myTx.Save(_ctx)
+		info, err = stm.Save(_ctx)
 		if err != nil {
 			return fmt.Errorf("fail update stock: %v", err)
 		}
@@ -178,7 +186,7 @@ func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields map[string]i
 	var err error
 
 	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		myTx := s.Tx.Stock.UpdateOneID(id)
+		stm := s.Tx.Stock.UpdateOneID(id)
 		for k, v := range fields {
 			increment, err := cruder.AnyTypeInt32(v)
 			if err != nil {
@@ -187,16 +195,18 @@ func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields map[string]i
 			increment *= -1
 
 			switch k {
+			case constant.StockFieldLocked:
+				stm = stm.AddLocked(increment)
 			case constant.StockFieldInService:
-				myTx = myTx.AddInService(increment)
+				stm = stm.AddInService(increment)
 			case constant.StockFieldSold:
-				myTx = myTx.AddSold(increment)
+				stm = stm.AddSold(increment)
 			default:
 				return fmt.Errorf("invalid stock field")
 			}
 		}
 
-		info, err = myTx.Save(_ctx)
+		info, err = stm.Save(_ctx)
 		if err != nil {
 			return fmt.Errorf("fail update stock: %v", err)
 		}
@@ -253,6 +263,19 @@ func (s *Stock) queryFromConds(conds map[string]*cruder.Cond) (*ent.StockQuery, 
 				stm = stm.Where(stock.TotalGT(value))
 			case cruder.LT:
 				stm = stm.Where(stock.TotalLT(value))
+			}
+		case constant.StockFieldLocked:
+			value, err := cruder.AnyTypeUint32(v.Val)
+			if err != nil {
+				return nil, fmt.Errorf("invalid value type: %v", err)
+			}
+			switch v.Op {
+			case cruder.EQ:
+				stm = stm.Where(stock.LockedEQ(value))
+			case cruder.GT:
+				stm = stm.Where(stock.LockedGT(value))
+			case cruder.LT:
+				stm = stm.Where(stock.LockedLT(value))
 			}
 		case constant.StockFieldInService:
 			value, err := cruder.AnyTypeUint32(v.Val)

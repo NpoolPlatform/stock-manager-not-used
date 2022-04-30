@@ -77,6 +77,12 @@ func (sc *StockCreate) SetTotal(u uint32) *StockCreate {
 	return sc
 }
 
+// SetLocked sets the "locked" field.
+func (sc *StockCreate) SetLocked(u uint32) *StockCreate {
+	sc.mutation.SetLocked(u)
+	return sc
+}
+
 // SetInService sets the "in_service" field.
 func (sc *StockCreate) SetInService(u uint32) *StockCreate {
 	sc.mutation.SetInService(u)
@@ -224,6 +230,9 @@ func (sc *StockCreate) check() error {
 	if _, ok := sc.mutation.Total(); !ok {
 		return &ValidationError{Name: "total", err: errors.New(`ent: missing required field "Stock.total"`)}
 	}
+	if _, ok := sc.mutation.Locked(); !ok {
+		return &ValidationError{Name: "locked", err: errors.New(`ent: missing required field "Stock.locked"`)}
+	}
 	if _, ok := sc.mutation.InService(); !ok {
 		return &ValidationError{Name: "in_service", err: errors.New(`ent: missing required field "Stock.in_service"`)}
 	}
@@ -306,6 +315,14 @@ func (sc *StockCreate) createSpec() (*Stock, *sqlgraph.CreateSpec) {
 			Column: stock.FieldTotal,
 		})
 		_node.Total = value
+	}
+	if value, ok := sc.mutation.Locked(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldLocked,
+		})
+		_node.Locked = value
 	}
 	if value, ok := sc.mutation.InService(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -458,6 +475,24 @@ func (u *StockUpsert) UpdateTotal() *StockUpsert {
 // AddTotal adds v to the "total" field.
 func (u *StockUpsert) AddTotal(v uint32) *StockUpsert {
 	u.Add(stock.FieldTotal, v)
+	return u
+}
+
+// SetLocked sets the "locked" field.
+func (u *StockUpsert) SetLocked(v uint32) *StockUpsert {
+	u.Set(stock.FieldLocked, v)
+	return u
+}
+
+// UpdateLocked sets the "locked" field to the value that was provided on create.
+func (u *StockUpsert) UpdateLocked() *StockUpsert {
+	u.SetExcluded(stock.FieldLocked)
+	return u
+}
+
+// AddLocked adds v to the "locked" field.
+func (u *StockUpsert) AddLocked(v uint32) *StockUpsert {
+	u.Add(stock.FieldLocked, v)
 	return u
 }
 
@@ -642,6 +677,27 @@ func (u *StockUpsertOne) AddTotal(v uint32) *StockUpsertOne {
 func (u *StockUpsertOne) UpdateTotal() *StockUpsertOne {
 	return u.Update(func(s *StockUpsert) {
 		s.UpdateTotal()
+	})
+}
+
+// SetLocked sets the "locked" field.
+func (u *StockUpsertOne) SetLocked(v uint32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.SetLocked(v)
+	})
+}
+
+// AddLocked adds v to the "locked" field.
+func (u *StockUpsertOne) AddLocked(v uint32) *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.AddLocked(v)
+	})
+}
+
+// UpdateLocked sets the "locked" field to the value that was provided on create.
+func (u *StockUpsertOne) UpdateLocked() *StockUpsertOne {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateLocked()
 	})
 }
 
@@ -998,6 +1054,27 @@ func (u *StockUpsertBulk) AddTotal(v uint32) *StockUpsertBulk {
 func (u *StockUpsertBulk) UpdateTotal() *StockUpsertBulk {
 	return u.Update(func(s *StockUpsert) {
 		s.UpdateTotal()
+	})
+}
+
+// SetLocked sets the "locked" field.
+func (u *StockUpsertBulk) SetLocked(v uint32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.SetLocked(v)
+	})
+}
+
+// AddLocked adds v to the "locked" field.
+func (u *StockUpsertBulk) AddLocked(v uint32) *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.AddLocked(v)
+	})
+}
+
+// UpdateLocked sets the "locked" field to the value that was provided on create.
+func (u *StockUpsertBulk) UpdateLocked() *StockUpsertBulk {
+	return u.Update(func(s *StockUpsert) {
+		s.UpdateLocked()
 	})
 }
 

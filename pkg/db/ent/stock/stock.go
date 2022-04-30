@@ -22,6 +22,8 @@ const (
 	FieldGoodID = "good_id"
 	// FieldTotal holds the string denoting the total field in the database.
 	FieldTotal = "total"
+	// FieldLocked holds the string denoting the locked field in the database.
+	FieldLocked = "locked"
 	// FieldInService holds the string denoting the in_service field in the database.
 	FieldInService = "in_service"
 	// FieldSold holds the string denoting the sold field in the database.
@@ -38,6 +40,7 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldGoodID,
 	FieldTotal,
+	FieldLocked,
 	FieldInService,
 	FieldSold,
 }

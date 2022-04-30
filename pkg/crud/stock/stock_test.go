@@ -27,13 +27,6 @@ func init() {
 	}
 }
 
-func assertStock(t *testing.T, actual, expected *npool.Stock) {
-	assert.Equal(t, actual.GoodID, expected.GoodID)
-	assert.Equal(t, actual.Total, expected.Total)
-	assert.Equal(t, actual.InService, expected.InService)
-	assert.Equal(t, actual.Sold, expected.Sold)
-}
-
 func TestCRUD(t *testing.T) {
 	stock := npool.Stock{
 		GoodID:    uuid.New().String(),
@@ -47,8 +40,10 @@ func TestCRUD(t *testing.T) {
 
 	info, err := schema.Create(context.Background(), &stock)
 	if assert.Nil(t, err) {
-		assert.NotEqual(t, info.ID, uuid.UUID{}.String())
-		assertStock(t, info, &stock)
+		if assert.NotEqual(t, info.ID, uuid.UUID{}.String()) {
+			stock.ID = info.ID
+		}
+		assert.Equal(t, info, &stock)
 	}
 
 	stock.InService = 100

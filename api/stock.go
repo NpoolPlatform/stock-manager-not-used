@@ -110,6 +110,8 @@ func stockFieldsToFields(fields map[string]*structpb.Value) (map[string]interfac
 			newFields[k] = v.GetStringValue()
 		case constant.StockFieldTotal:
 			newFields[k] = uint32(v.GetNumberValue())
+		case constant.StockFieldLocked:
+			newFields[k] = uint32(v.GetNumberValue())
 		case constant.StockFieldInService:
 			newFields[k] = uint32(v.GetNumberValue())
 		case constant.StockFieldSold:
@@ -248,6 +250,8 @@ func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (map[string]*cr
 				Val: v.Val.GetStringValue(),
 			}
 		case constant.StockFieldTotal:
+			fallthrough //nolint
+		case constant.StockFieldLocked:
 			fallthrough //nolint
 		case constant.StockFieldInService:
 			fallthrough //nolint

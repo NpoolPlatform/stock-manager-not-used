@@ -42,6 +42,8 @@ type StockMutation struct {
 	good_id       *uuid.UUID
 	total         *uint32
 	addtotal      *int32
+	locked        *uint32
+	addlocked     *int32
 	in_service    *uint32
 	addin_service *int32
 	sold          *uint32
@@ -416,6 +418,62 @@ func (m *StockMutation) ResetTotal() {
 	m.addtotal = nil
 }
 
+// SetLocked sets the "locked" field.
+func (m *StockMutation) SetLocked(u uint32) {
+	m.locked = &u
+	m.addlocked = nil
+}
+
+// Locked returns the value of the "locked" field in the mutation.
+func (m *StockMutation) Locked() (r uint32, exists bool) {
+	v := m.locked
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLocked returns the old "locked" field's value of the Stock entity.
+// If the Stock object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StockMutation) OldLocked(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLocked is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLocked requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLocked: %w", err)
+	}
+	return oldValue.Locked, nil
+}
+
+// AddLocked adds u to the "locked" field.
+func (m *StockMutation) AddLocked(u int32) {
+	if m.addlocked != nil {
+		*m.addlocked += u
+	} else {
+		m.addlocked = &u
+	}
+}
+
+// AddedLocked returns the value that was added to the "locked" field in this mutation.
+func (m *StockMutation) AddedLocked() (r int32, exists bool) {
+	v := m.addlocked
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLocked resets all changes to the "locked" field.
+func (m *StockMutation) ResetLocked() {
+	m.locked = nil
+	m.addlocked = nil
+}
+
 // SetInService sets the "in_service" field.
 func (m *StockMutation) SetInService(u uint32) {
 	m.in_service = &u
@@ -547,7 +605,7 @@ func (m *StockMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StockMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, stock.FieldCreatedAt)
 	}
@@ -562,6 +620,9 @@ func (m *StockMutation) Fields() []string {
 	}
 	if m.total != nil {
 		fields = append(fields, stock.FieldTotal)
+	}
+	if m.locked != nil {
+		fields = append(fields, stock.FieldLocked)
 	}
 	if m.in_service != nil {
 		fields = append(fields, stock.FieldInService)
@@ -587,6 +648,8 @@ func (m *StockMutation) Field(name string) (ent.Value, bool) {
 		return m.GoodID()
 	case stock.FieldTotal:
 		return m.Total()
+	case stock.FieldLocked:
+		return m.Locked()
 	case stock.FieldInService:
 		return m.InService()
 	case stock.FieldSold:
@@ -610,6 +673,8 @@ func (m *StockMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldGoodID(ctx)
 	case stock.FieldTotal:
 		return m.OldTotal(ctx)
+	case stock.FieldLocked:
+		return m.OldLocked(ctx)
 	case stock.FieldInService:
 		return m.OldInService(ctx)
 	case stock.FieldSold:
@@ -658,6 +723,13 @@ func (m *StockMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTotal(v)
 		return nil
+	case stock.FieldLocked:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLocked(v)
+		return nil
 	case stock.FieldInService:
 		v, ok := value.(uint32)
 		if !ok {
@@ -692,6 +764,9 @@ func (m *StockMutation) AddedFields() []string {
 	if m.addtotal != nil {
 		fields = append(fields, stock.FieldTotal)
 	}
+	if m.addlocked != nil {
+		fields = append(fields, stock.FieldLocked)
+	}
 	if m.addin_service != nil {
 		fields = append(fields, stock.FieldInService)
 	}
@@ -714,6 +789,8 @@ func (m *StockMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedDeletedAt()
 	case stock.FieldTotal:
 		return m.AddedTotal()
+	case stock.FieldLocked:
+		return m.AddedLocked()
 	case stock.FieldInService:
 		return m.AddedInService()
 	case stock.FieldSold:
@@ -754,6 +831,13 @@ func (m *StockMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTotal(v)
+		return nil
+	case stock.FieldLocked:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLocked(v)
 		return nil
 	case stock.FieldInService:
 		v, ok := value.(int32)
@@ -810,6 +894,9 @@ func (m *StockMutation) ResetField(name string) error {
 		return nil
 	case stock.FieldTotal:
 		m.ResetTotal()
+		return nil
+	case stock.FieldLocked:
+		m.ResetLocked()
 		return nil
 	case stock.FieldInService:
 		m.ResetInService()

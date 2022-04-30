@@ -16,6 +16,7 @@ var (
 		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "good_id", Type: field.TypeUUID},
 		{Name: "total", Type: field.TypeUint32},
+		{Name: "locked", Type: field.TypeUint32},
 		{Name: "in_service", Type: field.TypeUint32},
 		{Name: "sold", Type: field.TypeUint32},
 	}

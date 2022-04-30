@@ -30,6 +30,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			stock.FieldDeletedAt: {Type: field.TypeUint32, Column: stock.FieldDeletedAt},
 			stock.FieldGoodID:    {Type: field.TypeUUID, Column: stock.FieldGoodID},
 			stock.FieldTotal:     {Type: field.TypeUint32, Column: stock.FieldTotal},
+			stock.FieldLocked:    {Type: field.TypeUint32, Column: stock.FieldLocked},
 			stock.FieldInService: {Type: field.TypeUint32, Column: stock.FieldInService},
 			stock.FieldSold:      {Type: field.TypeUint32, Column: stock.FieldSold},
 		},
@@ -105,6 +106,11 @@ func (f *StockFilter) WhereGoodID(p entql.ValueP) {
 // WhereTotal applies the entql uint32 predicate on the total field.
 func (f *StockFilter) WhereTotal(p entql.Uint32P) {
 	f.Where(p.Field(stock.FieldTotal))
+}
+
+// WhereLocked applies the entql uint32 predicate on the locked field.
+func (f *StockFilter) WhereLocked(p entql.Uint32P) {
+	f.Where(p.Field(stock.FieldLocked))
 }
 
 // WhereInService applies the entql uint32 predicate on the in_service field.

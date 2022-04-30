@@ -102,6 +102,19 @@ func (su *StockUpdate) AddTotal(u int32) *StockUpdate {
 	return su
 }
 
+// SetLocked sets the "locked" field.
+func (su *StockUpdate) SetLocked(u uint32) *StockUpdate {
+	su.mutation.ResetLocked()
+	su.mutation.SetLocked(u)
+	return su
+}
+
+// AddLocked adds u to the "locked" field.
+func (su *StockUpdate) AddLocked(u int32) *StockUpdate {
+	su.mutation.AddLocked(u)
+	return su
+}
+
 // SetInService sets the "in_service" field.
 func (su *StockUpdate) SetInService(u uint32) *StockUpdate {
 	su.mutation.ResetInService()
@@ -283,6 +296,20 @@ func (su *StockUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: stock.FieldTotal,
 		})
 	}
+	if value, ok := su.mutation.Locked(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldLocked,
+		})
+	}
+	if value, ok := su.mutation.AddedLocked(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldLocked,
+		})
+	}
 	if value, ok := su.mutation.InService(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
@@ -401,6 +428,19 @@ func (suo *StockUpdateOne) SetTotal(u uint32) *StockUpdateOne {
 // AddTotal adds u to the "total" field.
 func (suo *StockUpdateOne) AddTotal(u int32) *StockUpdateOne {
 	suo.mutation.AddTotal(u)
+	return suo
+}
+
+// SetLocked sets the "locked" field.
+func (suo *StockUpdateOne) SetLocked(u uint32) *StockUpdateOne {
+	suo.mutation.ResetLocked()
+	suo.mutation.SetLocked(u)
+	return suo
+}
+
+// AddLocked adds u to the "locked" field.
+func (suo *StockUpdateOne) AddLocked(u int32) *StockUpdateOne {
+	suo.mutation.AddLocked(u)
 	return suo
 }
 
@@ -607,6 +647,20 @@ func (suo *StockUpdateOne) sqlSave(ctx context.Context) (_node *Stock, err error
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: stock.FieldTotal,
+		})
+	}
+	if value, ok := suo.mutation.Locked(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldLocked,
+		})
+	}
+	if value, ok := suo.mutation.AddedLocked(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: stock.FieldLocked,
 		})
 	}
 	if value, ok := suo.mutation.InService(); ok {

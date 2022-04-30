@@ -126,6 +126,13 @@ func Total(v uint32) predicate.Stock {
 	})
 }
 
+// Locked applies equality check predicate on the "locked" field. It's identical to LockedEQ.
+func Locked(v uint32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLocked), v))
+	})
+}
+
 // InService applies equality check predicate on the "in_service" field. It's identical to InServiceEQ.
 func InService(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
@@ -517,6 +524,82 @@ func TotalLT(v uint32) predicate.Stock {
 func TotalLTE(v uint32) predicate.Stock {
 	return predicate.Stock(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldTotal), v))
+	})
+}
+
+// LockedEQ applies the EQ predicate on the "locked" field.
+func LockedEQ(v uint32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLocked), v))
+	})
+}
+
+// LockedNEQ applies the NEQ predicate on the "locked" field.
+func LockedNEQ(v uint32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldLocked), v))
+	})
+}
+
+// LockedIn applies the In predicate on the "locked" field.
+func LockedIn(vs ...uint32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldLocked), v...))
+	})
+}
+
+// LockedNotIn applies the NotIn predicate on the "locked" field.
+func LockedNotIn(vs ...uint32) predicate.Stock {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Stock(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldLocked), v...))
+	})
+}
+
+// LockedGT applies the GT predicate on the "locked" field.
+func LockedGT(v uint32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldLocked), v))
+	})
+}
+
+// LockedGTE applies the GTE predicate on the "locked" field.
+func LockedGTE(v uint32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldLocked), v))
+	})
+}
+
+// LockedLT applies the LT predicate on the "locked" field.
+func LockedLT(v uint32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldLocked), v))
+	})
+}
+
+// LockedLTE applies the LTE predicate on the "locked" field.
+func LockedLTE(v uint32) predicate.Stock {
+	return predicate.Stock(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldLocked), v))
 	})
 }
 
