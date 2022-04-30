@@ -101,7 +101,7 @@ func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[strin
 	return s.Row(ctx, id)
 }
 
-func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
+func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) { //nolint
 	var info *ent.Stock
 	var err error
 
