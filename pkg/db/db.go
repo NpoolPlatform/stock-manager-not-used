@@ -93,7 +93,7 @@ func NewEntity(ctx context.Context, _tx *ent.Tx) (*Entity, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fail get db client: %v", err)
 	}
-	_tx, err = cli.Debug().Tx(ctx)
+	_tx, err = cli.Tx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("fail get client transaction: %v", err)
 	}
