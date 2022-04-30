@@ -5,15 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	_ "entgo.io/ent/dialect/sql" //nolint
-
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent"
 	"github.com/NpoolPlatform/stock-manager/pkg/db/ent/stock"
 
 	constant "github.com/NpoolPlatform/stock-manager/pkg/const"
-	"github.com/NpoolPlatform/stock-manager/pkg/crud/entity"
-	"github.com/NpoolPlatform/stock-manager/pkg/crud/tx"
+	"github.com/NpoolPlatform/stock-manager/pkg/db"
 
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 
@@ -21,11 +18,11 @@ import (
 )
 
 type Stock struct {
-	*entity.Entity
+	*db.Entity
 }
 
-func New(ctx context.Context, _tx *ent.Tx) (*Stock, error) {
-	e, err := entity.New(ctx, _tx)
+func New(ctx context.Context, tx *ent.Tx) (*Stock, error) {
+	e, err := db.NewEntity(ctx, tx)
 	if err != nil {
 		return nil, fmt.Errorf("fail create entity: %v", err)
 	}
@@ -50,7 +47,7 @@ func (s *Stock) Create(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 	var info *ent.Stock
 	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		info, err = s.Tx.Stock.Create().
 			SetGoodID(uuid.MustParse(in.GetGoodID())).
 			SetTotal(in.GetTotal()).
@@ -71,7 +68,7 @@ func (s *Stock) CreateBulk(ctx context.Context, in []*npool.Stock) ([]*npool.Sto
 	rows := []*ent.Stock{}
 	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		bulk := make([]*ent.StockCreate, len(in))
 		for i, info := range in {
 			bulk[i] = s.Tx.Stock.Create().
@@ -97,58 +94,45 @@ func (s *Stock) CreateBulk(ctx context.Context, in []*npool.Stock) ([]*npool.Sto
 }
 
 func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, error) {
-	var info *ent.Stock
-	var err error
-
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		info, err = s.Tx.Stock.UpdateOneID(uuid.MustParse(in.GetID())).
-			SetLocked(in.GetLocked()).
-			SetInService(in.GetInService()).
-			SetSold(in.GetSold()).
-			Save(_ctx)
-		return err
-	})
-	if err != nil {
-		return nil, fmt.Errorf("fail update stock: %v", err)
-	}
-
-	return s.rowToObject(info), nil
+	return in, nil
 }
 
 func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
-	var info *ent.Stock
-	var err error
-
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		stm := s.Tx.Stock.UpdateOneID(id)
-		for k, v := range fields {
-			switch k {
-			case constant.StockFieldLocked:
-				stm = stm.SetLocked(v.(uint32))
-			case constant.StockFieldInService:
-				stm = stm.SetInService(v.(uint32))
-			case constant.StockFieldSold:
-				stm = stm.SetSold(v.(uint32))
-			default:
-				return fmt.Errorf("invalid stock field")
-			}
-		}
-		info, err = stm.Save(_ctx)
-		return err
-	})
-	if err != nil {
-		return nil, fmt.Errorf("fail update stock: %v", err)
-	}
-
-	return s.rowToObject(info), nil
+	return s.Row(ctx, id)
 }
 
 func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
 	var info *ent.Stock
 	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
-		stm := s.Tx.Stock.UpdateOneID(id)
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		newSold := uint32(0)
+
+		for k, v := range fields {
+			increment, err := cruder.AnyTypeUint32(v)
+			if err != nil {
+				return fmt.Errorf("invalid value type: %v", err)
+			}
+
+			switch k {
+			case constant.StockFieldLocked:
+				fallthrough //nolint
+			case constant.StockFieldInService:
+				newSold += increment
+			}
+		}
+
+		info, err = s.Tx.Stock.Query().Where(stock.ID(id)).ForUpdate().Only(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail query stock: %v", err)
+		}
+
+		if info.InService+info.Locked+newSold >= info.Total {
+			return fmt.Errorf("stock exhausted")
+		}
+
+		stm := info.Update()
+
 		for k, v := range fields {
 			increment, err := cruder.AnyTypeInt32(v)
 			if err != nil {
@@ -157,19 +141,16 @@ func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]i
 
 			switch k {
 			case constant.StockFieldLocked:
-				stm = stm.AddLocked(increment)
-			case constant.StockFieldInService:
 				stm = stm.AddInService(increment)
-			case constant.StockFieldSold:
+			case constant.StockFieldInService:
+				stm = stm.AddLocked(increment)
 				stm = stm.AddSold(increment)
-			default:
-				return fmt.Errorf("invalid stock field")
 			}
 		}
 
 		info, err = stm.Save(_ctx)
 		if err != nil {
-			return fmt.Errorf("fail update stock: %v", err)
+			return fmt.Errorf("fail to update stock: %v", err)
 		}
 
 		return nil
@@ -185,7 +166,7 @@ func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields map[string]i
 	var info *ent.Stock
 	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		stm := s.Tx.Stock.UpdateOneID(id)
 		for k, v := range fields {
 			increment, err := cruder.AnyTypeInt32(v)
@@ -199,8 +180,6 @@ func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields map[string]i
 				stm = stm.AddLocked(increment)
 			case constant.StockFieldInService:
 				stm = stm.AddInService(increment)
-			case constant.StockFieldSold:
-				stm = stm.AddSold(increment)
 			default:
 				return fmt.Errorf("invalid stock field")
 			}
@@ -208,7 +187,7 @@ func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields map[string]i
 
 		info, err = stm.Save(_ctx)
 		if err != nil {
-			return fmt.Errorf("fail update stock: %v", err)
+			return fmt.Errorf("fail sub stock fields: %v", err)
 		}
 
 		return nil
@@ -224,7 +203,7 @@ func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 	var info *ent.Stock
 	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		info, err = s.Tx.Stock.Query().Where(stock.ID(id)).Only(_ctx)
 		return err
 	})
@@ -315,7 +294,7 @@ func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset,
 	rows := []*ent.Stock{}
 	var total int
 
-	err := tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err := db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		stm, err := s.queryFromConds(conds)
 		if err != nil {
 			return fmt.Errorf("fail construct stm: %v", err)
@@ -349,7 +328,7 @@ func (s *Stock) Count(ctx context.Context, conds map[string]*cruder.Cond) (uint3
 	var err error
 	var total int
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		stm, err := s.queryFromConds(conds)
 		if err != nil {
 			return fmt.Errorf("fail construct stm: %v", err)
@@ -373,7 +352,7 @@ func (s *Stock) Exist(ctx context.Context, id uuid.UUID) (bool, error) {
 	var err error
 	exist := false
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		exist, err = s.Tx.Stock.Query().Where(stock.ID(id)).Exist(_ctx)
 		return err
 	})
@@ -388,7 +367,7 @@ func (s *Stock) ExistConds(ctx context.Context, conds map[string]*cruder.Cond) (
 	var err error
 	exist := false
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		stm, err := s.queryFromConds(conds)
 		if err != nil {
 			return fmt.Errorf("fail construct stm: %v", err)
@@ -412,7 +391,7 @@ func (s *Stock) Delete(ctx context.Context, id uuid.UUID) (*npool.Stock, error) 
 	var info *ent.Stock
 	var err error
 
-	err = tx.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		info, err = s.Tx.Stock.UpdateOneID(id).
 			SetDeletedAt(uint32(time.Now().Unix())).
 			Save(_ctx)

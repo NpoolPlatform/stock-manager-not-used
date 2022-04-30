@@ -29,6 +29,11 @@ func (s *Server) CreateStock(ctx context.Context, in *npool.CreateStockRequest) 
 		return &npool.CreateStockResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
+	if in.GetInfo().GetTotal() <= 0 {
+		logger.Sugar().Errorf("invalid good total number")
+		return &npool.CreateStockResponse{}, status.Error(codes.Internal, "invalid good parameter")
+	}
+
 	schema, err := crud.New(ctx, nil)
 	if err != nil {
 		logger.Sugar().Errorf("fail create schema entity: %v", err)
