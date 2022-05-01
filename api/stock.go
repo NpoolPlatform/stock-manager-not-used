@@ -290,6 +290,30 @@ func (s *Server) GetStock(ctx context.Context, in *npool.GetStockRequest) (*npoo
 	}, nil
 }
 
+func (s *Server) GetStockOnly(ctx context.Context, in *npool.GetStockOnlyRequest) (*npool.GetStockOnlyResponse, error) {
+	conds, err := stockCondsToConds(in.GetConds())
+	if err != nil {
+		logger.Sugar().Errorf("invalid stock fields: %v", err)
+		return &npool.GetStockOnlyResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	schema, err := crud.New(ctx, nil)
+	if err != nil {
+		logger.Sugar().Errorf("fail create schema entity: %v", err)
+		return &npool.GetStockOnlyResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	info, err := schema.RowOnly(ctx, conds)
+	if err != nil {
+		logger.Sugar().Errorf("fail get stocks: %v", err)
+		return &npool.GetStockOnlyResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetStockOnlyResponse{
+		Info: info,
+	}, nil
+}
+
 func (s *Server) GetStocks(ctx context.Context, in *npool.GetStocksRequest) (*npool.GetStocksResponse, error) {
 	conds, err := stockCondsToConds(in.GetConds())
 	if err != nil {

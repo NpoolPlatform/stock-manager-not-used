@@ -257,7 +257,7 @@ func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 	return s.rowToObject(info), nil
 }
 
-func (s *Stock) queryFromConds(conds map[string]*cruder.Cond) (*ent.StockQuery, error) { //nolint
+func (s *Stock) queryFromConds(conds cruder.Conds) (*ent.StockQuery, error) { //nolint
 	stm := s.Tx.Stock.Query()
 	for k, v := range conds {
 		switch k {
@@ -333,7 +333,7 @@ func (s *Stock) queryFromConds(conds map[string]*cruder.Cond) (*ent.StockQuery, 
 	return stm, nil
 }
 
-func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset, limit int) ([]*npool.Stock, int, error) {
+func (s *Stock) Rows(ctx context.Context, conds cruder.Conds, offset, limit int) ([]*npool.Stock, int, error) {
 	rows := []*ent.Stock{}
 	var total int
 
@@ -367,7 +367,30 @@ func (s *Stock) Rows(ctx context.Context, conds map[string]*cruder.Cond, offset,
 	return infos, total, nil
 }
 
-func (s *Stock) Count(ctx context.Context, conds map[string]*cruder.Cond) (uint32, error) {
+func (s *Stock) RowOnly(ctx context.Context, conds cruder.Conds) (*npool.Stock, error) {
+	var info *ent.Stock
+
+	err := db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		stm, err := s.queryFromConds(conds)
+		if err != nil {
+			return fmt.Errorf("fail construct stm: %v", err)
+		}
+
+		info, err = stm.Only(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail query stock: %v", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail get stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
+}
+
+func (s *Stock) Count(ctx context.Context, conds cruder.Conds) (uint32, error) {
 	var err error
 	var total int
 
@@ -406,7 +429,7 @@ func (s *Stock) Exist(ctx context.Context, id uuid.UUID) (bool, error) {
 	return exist, nil
 }
 
-func (s *Stock) ExistConds(ctx context.Context, conds map[string]*cruder.Cond) (bool, error) {
+func (s *Stock) ExistConds(ctx context.Context, conds cruder.Conds) (bool, error) {
 	var err error
 	exist := false
 

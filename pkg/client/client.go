@@ -8,7 +8,6 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	commonnpool "github.com/NpoolPlatform/message/npool"
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 
 	servicename "github.com/NpoolPlatform/stock-manager/pkg/service-name"
@@ -29,7 +28,7 @@ func do(ctx context.Context, fn func(_ctx context.Context, cli npool.StockManage
 	return fn(_ctx, cli)
 }
 
-func Stocks(ctx context.Context, conds map[string]*commonnpool.FilterCond) ([]*npool.Stock, error) {
+func GetStocks(ctx context.Context, conds cruder.FilterConds) ([]*npool.Stock, error) {
 	infos, err := do(ctx, func(_ctx context.Context, cli npool.StockManagerClient) (cruder.Any, error) {
 		resp, err := cli.GetStocks(ctx, &npool.GetStocksRequest{
 			Conds: conds,
@@ -43,4 +42,36 @@ func Stocks(ctx context.Context, conds map[string]*commonnpool.FilterCond) ([]*n
 		return nil, fmt.Errorf("fail get stocks: %v", err)
 	}
 	return infos.([]*npool.Stock), nil
+}
+
+func GetStockOnly(ctx context.Context, conds cruder.FilterConds) (*npool.Stock, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.StockManagerClient) (cruder.Any, error) {
+		resp, err := cli.GetStockOnly(ctx, &npool.GetStockOnlyRequest{
+			Conds: conds,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("fail get stock: %v", err)
+		}
+		return resp.Info, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail get stock: %v", err)
+	}
+	return info.(*npool.Stock), nil
+}
+
+func AddFields(ctx context.Context, fields cruder.FilterFields) (*npool.Stock, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.StockManagerClient) (cruder.Any, error) {
+		resp, err := cli.AddStockFields(ctx, &npool.AddStockFieldsRequest{
+			Fields: fields,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("fail add stock fields: %v", err)
+		}
+		return resp.Info, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail add stock fields: %v", err)
+	}
+	return info.(*npool.Stock), nil
 }

@@ -27,7 +27,7 @@ func init() {
 }
 
 func TestClient(t *testing.T) {
-	_, err := Stocks(context.Background(),
+	_, err := GetStocks(context.Background(),
 		cruder.NewFilterConds().
 			WithCond(constant.StockFieldGoodID, cruder.EQ, structpb.NewStringValue(uuid.UUID{}.String())))
 	// Here won't pass test due to we always test with localhost

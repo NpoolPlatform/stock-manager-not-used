@@ -78,6 +78,15 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
+	info, err = schema.RowOnly(context.Background(),
+		cruder.NewConds().WithCond(constant.FieldID, cruder.EQ, info.ID))
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
 	exist, err := schema.ExistConds(context.Background(),
 		cruder.NewConds().WithCond(constant.FieldID, cruder.EQ, info.ID),
 	)
