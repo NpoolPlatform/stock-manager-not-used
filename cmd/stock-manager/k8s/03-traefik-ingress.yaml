@@ -6,7 +6,7 @@ metadata:
   annotations:
     k8s.kuboard.cn/displayName: stock-manager-traefik-app
     k8s.kuboard.cn/workload: stock-manager-traefik-app
-    kubernetes.io/ingress.class: "traefik-internet-app"
+    kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-stock-manager-prefix@kubernetescrd,
                                                       kube-system-common-headers@kubernetescrd,
@@ -14,6 +14,41 @@ metadata:
                                                       kube-system-headers-userid-to-body@kubernetescrd,
                                                       kube-system-headers-app-login-token-to-body@kubernetescrd,
                                                       kube-system-app-rbac-auth@kubernetescrd
+
+spec:
+  rules:
+    - host: api.npool.top
+      http: &http_rules
+        paths:
+          - path: /api/stock-manager/version
+            backend:
+              serviceName: stock-manager
+              servicePort: 50270
+    - host: api.procyon.vip
+      http: *http_rules
+    - host: api.xpool.top
+      http: *http_rules
+    - host: api.ohhash.com
+      http: *http_rules
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: stock-manager-traefik-app-user-ingress
+  namespace: kube-system
+  annotations:
+    k8s.kuboard.cn/displayName: stock-manager-traefik-app-user
+    k8s.kuboard.cn/workload: stock-manager-traefik-app-user
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-stock-manager-prefix@kubernetescrd,
+                                                      kube-system-common-headers@kubernetescrd,
+                                                      kube-system-headers-appid-to-body@kubernetescrd,
+                                                      kube-system-headers-userid-to-body@kubernetescrd,
+                                                      kube-system-headers-app-login-token-to-body@kubernetescrd,
+                                                      kube-system-app-user-role-rbac-auth@kubernetescrd
 
 spec:
   rules:
