@@ -20,7 +20,11 @@ spec:
     - host: api.npool.top
       http: &http_rules
         paths:
-          - path: /api/stock-manager
+          - path: /api/stock-manager/get/stocks
+            backend:
+              serviceName: stock-manager
+              servicePort: 50270
+          - path: /api/stock-manager/create/stock
             backend:
               serviceName: stock-manager
               servicePort: 50270
