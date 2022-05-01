@@ -10,14 +10,14 @@ import (
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 
-	servicename "github.com/NpoolPlatform/stock-manager/pkg/service-name"
+	constant "github.com/NpoolPlatform/stock-manager/pkg/message/const"
 )
 
 func do(ctx context.Context, fn func(_ctx context.Context, cli npool.StockManagerClient) (cruder.Any, error)) (cruder.Any, error) {
 	_ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	conn, err := grpc2.GetGRPCConn(servicename.ServiceName, grpc2.GRPCTAG)
+	conn, err := grpc2.GetGRPCConn(constant.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
 		return nil, fmt.Errorf("fail get stock connection: %v", err)
 	}
