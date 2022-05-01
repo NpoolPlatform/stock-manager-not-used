@@ -6,7 +6,7 @@ require (
 	entgo.io/ent v0.10.1
 	github.com/NpoolPlatform/api-manager v0.0.0-20220121051827-18c807c114dc
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220120091626-4e8035637592
-	github.com/NpoolPlatform/message v0.0.0-20220430024255-a1acb73798a1
+	github.com/NpoolPlatform/message v0.0.0-20220501030927-34f296682c0c
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.8.0
 	github.com/streadway/amqp v1.0.0
@@ -15,7 +15,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 	google.golang.org/grpc v1.46.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/protobuf v1.28.0
 )
 
 require (
@@ -83,7 +83,7 @@ require (
 
 require (
 	ariga.io/atlas v0.3.7-0.20220303204946-787354f533c3 // indirect
-	github.com/NpoolPlatform/libent-cruder v0.0.0-20220501024333-cd616271fb5d
+	github.com/NpoolPlatform/libent-cruder v0.0.0-20220501040231-b762759f7d91
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
