@@ -11,7 +11,7 @@ import (
 	commonnpool "github.com/NpoolPlatform/message/npool"
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 
-	"github.com/NpoolPlatform/stock-manager/pkg/service-name"
+	servicename "github.com/NpoolPlatform/stock-manager/pkg/service-name"
 )
 
 func do(ctx context.Context, fn func(_ctx context.Context, cli npool.StockManagerClient) (cruder.Any, error)) (cruder.Any, error) {

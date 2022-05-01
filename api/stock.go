@@ -297,11 +297,6 @@ func (s *Server) GetStocks(ctx context.Context, in *npool.GetStocksRequest) (*np
 		return &npool.GetStocksResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	if len(conds) == 0 {
-		logger.Sugar().Errorf("empty stock fields: %v", err)
-		return &npool.GetStocksResponse{}, status.Error(codes.Internal, "empty stock fields")
-	}
-
 	schema, err := crud.New(ctx, nil)
 	if err != nil {
 		logger.Sugar().Errorf("fail create schema entity: %v", err)
