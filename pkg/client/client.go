@@ -60,7 +60,7 @@ func GetStockOnly(ctx context.Context, conds cruder.FilterConds) (*npool.Stock, 
 	return info.(*npool.Stock), nil
 }
 
-func AddFields(ctx context.Context, id string, fields cruder.FilterFields) (*npool.Stock, error) {
+func AddStockFields(ctx context.Context, id string, fields cruder.FilterFields) (*npool.Stock, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.StockManagerClient) (cruder.Any, error) {
 		resp, err := cli.AddStockFields(ctx, &npool.AddStockFieldsRequest{
 			ID:     id,
