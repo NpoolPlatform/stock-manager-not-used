@@ -198,41 +198,6 @@ func (s *Server) AddStockFields(ctx context.Context, in *npool.AddStockFieldsReq
 	}, nil
 }
 
-func (s *Server) SubStockFields(ctx context.Context, in *npool.SubStockFieldsRequest) (*npool.SubStockFieldsResponse, error) {
-	id, err := uuid.Parse(in.GetID())
-	if err != nil {
-		logger.Sugar().Errorf("invalid stock id: %v", err)
-		return &npool.SubStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	fields, err := stockFieldsToFields(in.GetFields())
-	if err != nil {
-		logger.Sugar().Errorf("invalid stock fields: %v", err)
-		return &npool.SubStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	if len(fields) == 0 {
-		logger.Sugar().Errorf("empty stock fields: %v", err)
-		return &npool.SubStockFieldsResponse{}, status.Error(codes.Internal, "empty stock fields")
-	}
-
-	schema, err := crud.New(ctx, nil)
-	if err != nil {
-		logger.Sugar().Errorf("fail create schema entity: %v", err)
-		return &npool.SubStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	info, err := schema.SubFields(ctx, id, fields)
-	if err != nil {
-		logger.Sugar().Errorf("fail sub stock fields: %v", err)
-		return &npool.SubStockFieldsResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	return &npool.SubStockFieldsResponse{
-		Info: info,
-	}, nil
-}
-
 func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (cruder.Conds, error) {
 	newConds := cruder.NewConds()
 

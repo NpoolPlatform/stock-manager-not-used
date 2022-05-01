@@ -139,22 +139,6 @@ func TestCRUD(t *testing.T) {
 	)
 	assert.NotNil(t, err)
 
-	schema, err = New(context.Background(), nil)
-	assert.Nil(t, err)
-
-	stock.InService = 0
-	stock.Locked = 0
-
-	info, err = schema.SubFields(context.Background(),
-		uuid.MustParse(info.ID),
-		cruder.NewFields().
-			WithField(constant.StockFieldInService, 1).
-			WithField(constant.StockFieldLocked, 1),
-	)
-	if assert.Nil(t, err) {
-		assert.Equal(t, info, &stock)
-	}
-
 	stock1 := &npool.Stock{
 		GoodID:    uuid.New().String(),
 		Total:     1000,
