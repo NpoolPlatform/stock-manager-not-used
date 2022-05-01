@@ -63,6 +63,10 @@ spec:
             backend:
               serviceName: stock-manager
               servicePort: 50270
+          - path: /api/stock-manager/v1/update/stock
+            backend:
+              serviceName: stock-manager
+              servicePort: 50270
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
