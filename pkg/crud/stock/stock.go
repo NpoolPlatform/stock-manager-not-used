@@ -117,15 +117,14 @@ func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields cruder.Fi
 	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		stm := s.Tx.Stock.UpdateOneID(id)
 		for k, v := range fields {
-			increment, err := cruder.AnyTypeInt32(v)
+			total, err := cruder.AnyTypeUint32(v)
 			if err != nil {
 				return fmt.Errorf("invalid value type: %v", err)
 			}
-			increment *= -1
 
 			switch k {
 			case constant.StockFieldTotal:
-				stm = stm.AddLocked(increment)
+				stm = stm.SetTotal(total)
 			default:
 				return fmt.Errorf("invalid stock field")
 			}
