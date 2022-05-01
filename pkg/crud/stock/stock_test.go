@@ -99,8 +99,6 @@ func TestCRUD(t *testing.T) {
 		assert.Equal(t, info, &stock)
 	}
 
-	return
-
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
