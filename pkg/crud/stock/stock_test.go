@@ -111,14 +111,14 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
-	stock.InService = 1
+	stock.InService = 2
 	stock.Locked = 1
-	stock.Sold = 1
+	stock.Sold = 2
 
 	info, err = schema.AddFields(context.Background(),
 		uuid.MustParse(info.ID),
 		cruder.NewFields().
-			WithField(constant.StockFieldInService, 1).
+			WithField(constant.StockFieldInService, 2).
 			WithField(constant.StockFieldLocked, 1),
 	)
 	if assert.Nil(t, err) {
@@ -134,7 +134,7 @@ func TestCRUD(t *testing.T) {
 	_, err = schema.AddFields(context.Background(),
 		uuid.MustParse(info.ID),
 		cruder.NewFields().
-			WithField(constant.StockFieldInService, 5001).
+			WithField(constant.StockFieldInService, 5002).
 			WithField(constant.StockFieldLocked, 5001),
 	)
 	assert.NotNil(t, err)
