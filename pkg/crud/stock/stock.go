@@ -97,11 +97,11 @@ func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, erro
 	return in, nil
 }
 
-func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
+func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields cruder.Fields) (*npool.Stock, error) {
 	return s.Row(ctx, id)
 }
 
-func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) { //nolint
+func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields cruder.Fields) (*npool.Stock, error) { //nolint
 	var info *ent.Stock
 	var err error
 
@@ -162,7 +162,7 @@ func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields map[string]i
 	return s.rowToObject(info), nil
 }
 
-func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields map[string]interface{}) (*npool.Stock, error) {
+func (s *Stock) SubFields(ctx context.Context, id uuid.UUID, fields cruder.Fields) (*npool.Stock, error) {
 	var info *ent.Stock
 	var err error
 

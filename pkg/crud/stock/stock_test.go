@@ -67,12 +67,9 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
-	infos, total, err := schema.Rows(context.Background(), map[string]*cruder.Cond{
-		constant.FieldID: {
-			Op:  cruder.EQ,
-			Val: info.ID,
-		},
-	}, 0, 0)
+	infos, total, err := schema.Rows(context.Background(),
+		cruder.NewConds().WithCond(constant.FieldID, cruder.EQ, info.ID),
+		0, 0)
 	if assert.Nil(t, err) {
 		assert.Equal(t, total, 1)
 		assert.Equal(t, infos[0], &stock)
@@ -81,12 +78,9 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
-	exist, err := schema.ExistConds(context.Background(), map[string]*cruder.Cond{
-		constant.FieldID: {
-			Op:  cruder.EQ,
-			Val: info.ID,
-		},
-	})
+	exist, err := schema.ExistConds(context.Background(),
+		cruder.NewConds().WithCond(constant.FieldID, cruder.EQ, info.ID),
+	)
 	if assert.Nil(t, err) {
 		assert.Equal(t, exist, true)
 	}
@@ -96,10 +90,10 @@ func TestCRUD(t *testing.T) {
 
 	info, err = schema.UpdateFields(context.Background(),
 		uuid.MustParse(info.ID),
-		map[string]interface{}{
-			constant.StockFieldInService: stock.InService,
-			constant.StockFieldSold:      stock.Sold,
-		})
+		cruder.NewFields().
+			WithField(constant.StockFieldInService, 100).
+			WithField(constant.StockFieldLocked, 100),
+	)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, &stock)
 	}
@@ -113,10 +107,10 @@ func TestCRUD(t *testing.T) {
 
 	info, err = schema.AddFields(context.Background(),
 		uuid.MustParse(info.ID),
-		map[string]interface{}{
-			constant.StockFieldInService: 1,
-			constant.StockFieldLocked:    1,
-		})
+		cruder.NewFields().
+			WithField(constant.StockFieldInService, 1).
+			WithField(constant.StockFieldLocked, 1),
+	)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, &stock)
 	}
@@ -132,10 +126,10 @@ func TestCRUD(t *testing.T) {
 
 	info, err = schema.SubFields(context.Background(),
 		uuid.MustParse(info.ID),
-		map[string]interface{}{
-			constant.StockFieldInService: 1,
-			constant.StockFieldLocked:    1,
-		})
+		cruder.NewFields().
+			WithField(constant.StockFieldInService, 1).
+			WithField(constant.StockFieldLocked, 1),
+	)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, &stock)
 	}
@@ -166,12 +160,9 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
-	count, err := schema.Count(context.Background(), map[string]*cruder.Cond{
-		constant.FieldID: {
-			Op:  cruder.EQ,
-			Val: info.ID,
-		},
-	})
+	count, err := schema.Count(context.Background(),
+		cruder.NewConds().WithCond(constant.FieldID, cruder.EQ, info.ID),
+	)
 	if assert.Nil(t, err) {
 		assert.Equal(t, count, uint32(1))
 	}
@@ -187,12 +178,9 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
-	count, err = schema.Count(context.Background(), map[string]*cruder.Cond{
-		constant.FieldID: {
-			Op:  cruder.EQ,
-			Val: info.ID,
-		},
-	})
+	count, err = schema.Count(context.Background(),
+		cruder.NewConds().WithCond(constant.FieldID, cruder.EQ, info.ID),
+	)
 	if assert.Nil(t, err) {
 		assert.Equal(t, count, uint32(0))
 	}

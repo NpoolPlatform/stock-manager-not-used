@@ -83,7 +83,7 @@ require (
 
 require (
 	ariga.io/atlas v0.3.7-0.20220303204946-787354f533c3 // indirect
-	github.com/NpoolPlatform/libent-cruder v0.0.0-20220429131232-7e7a5e97226a
+	github.com/NpoolPlatform/libent-cruder v0.0.0-20220501024333-cd616271fb5d
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect

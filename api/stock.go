@@ -104,23 +104,23 @@ func (s *Server) UpdateStock(ctx context.Context, in *npool.UpdateStockRequest) 
 	}, nil
 }
 
-func stockFieldsToFields(fields map[string]*structpb.Value) (map[string]interface{}, error) {
-	newFields := map[string]interface{}{}
+func stockFieldsToFields(fields map[string]*structpb.Value) (cruder.Fields, error) {
+	newFields := cruder.NewFields()
 
 	for k, v := range fields {
 		switch k {
 		case constant.FieldID:
-			newFields[k] = v.GetStringValue()
+			fallthrough //nolint
 		case constant.StockFieldGoodID:
-			newFields[k] = v.GetStringValue()
+			newFields.WithField(k, v.GetStringValue())
 		case constant.StockFieldTotal:
-			newFields[k] = uint32(v.GetNumberValue())
+			fallthrough //nolint
 		case constant.StockFieldLocked:
-			newFields[k] = uint32(v.GetNumberValue())
+			fallthrough //nolint
 		case constant.StockFieldInService:
-			newFields[k] = uint32(v.GetNumberValue())
+			fallthrough //nolint
 		case constant.StockFieldSold:
-			newFields[k] = uint32(v.GetNumberValue())
+			newFields.WithField(k, v.GetNumberValue())
 		default:
 			return nil, fmt.Errorf("invalid stock field")
 		}
@@ -233,8 +233,8 @@ func (s *Server) SubStockFields(ctx context.Context, in *npool.SubStockFieldsReq
 	}, nil
 }
 
-func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (map[string]*cruder.Cond, error) {
-	newConds := map[string]*cruder.Cond{}
+func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (cruder.Conds, error) {
+	newConds := cruder.NewConds()
 
 	for k, v := range conds {
 		switch v.Op {
@@ -250,10 +250,7 @@ func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (map[string]*cr
 		case constant.FieldID:
 			fallthrough //nolint
 		case constant.StockFieldGoodID:
-			newConds[k] = &cruder.Cond{
-				Op:  v.Op,
-				Val: v.Val.GetStringValue(),
-			}
+			newConds = newConds.WithCond(k, v.Op, v.Val.GetStringValue())
 		case constant.StockFieldTotal:
 			fallthrough //nolint
 		case constant.StockFieldLocked:
@@ -261,10 +258,7 @@ func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (map[string]*cr
 		case constant.StockFieldInService:
 			fallthrough //nolint
 		case constant.StockFieldSold:
-			newConds[k] = &cruder.Cond{
-				Op:  v.Op,
-				Val: v.Val.GetNumberValue(),
-			}
+			newConds = newConds.WithCond(k, v.Op, v.Val.GetNumberValue())
 		default:
 			return nil, fmt.Errorf("invalid stock field")
 		}
