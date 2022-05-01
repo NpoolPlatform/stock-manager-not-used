@@ -76,3 +76,20 @@ func AddStockFields(ctx context.Context, id string, fields cruder.FilterFields) 
 	}
 	return info.(*npool.Stock), nil
 }
+
+func SubStockFields(ctx context.Context, id string, fields cruder.FilterFields) (*npool.Stock, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.StockManagerClient) (cruder.Any, error) {
+		resp, err := cli.SubStockFields(ctx, &npool.SubStockFieldsRequest{
+			ID:     id,
+			Fields: fields,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("fail sub stock fields: %v", err)
+		}
+		return resp.Info, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail sub stock fields: %v", err)
+	}
+	return info.(*npool.Stock), nil
+}
