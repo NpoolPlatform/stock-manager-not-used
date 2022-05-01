@@ -94,11 +94,55 @@ func (s *Stock) CreateBulk(ctx context.Context, in []*npool.Stock) ([]*npool.Sto
 }
 
 func (s *Stock) Update(ctx context.Context, in *npool.Stock) (*npool.Stock, error) {
-	return in, nil
+	var info *ent.Stock
+	var err error
+
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		info, err = s.Tx.Stock.UpdateOneID(uuid.MustParse(in.GetID())).
+			SetTotal(in.GetTotal()).
+			Save(_ctx)
+		return err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail update stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
 }
 
 func (s *Stock) UpdateFields(ctx context.Context, id uuid.UUID, fields cruder.Fields) (*npool.Stock, error) {
-	return s.Row(ctx, id)
+	var info *ent.Stock
+	var err error
+
+	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
+		stm := s.Tx.Stock.UpdateOneID(id)
+		for k, v := range fields {
+			increment, err := cruder.AnyTypeInt32(v)
+			if err != nil {
+				return fmt.Errorf("invalid value type: %v", err)
+			}
+			increment *= -1
+
+			switch k {
+			case constant.StockFieldTotal:
+				stm = stm.AddLocked(increment)
+			default:
+				return fmt.Errorf("invalid stock field")
+			}
+		}
+
+		info, err = stm.Save(_ctx)
+		if err != nil {
+			return fmt.Errorf("fail update stock fields: %v", err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail update stock: %v", err)
+	}
+
+	return s.rowToObject(info), nil
 }
 
 func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields cruder.Fields) (*npool.Stock, error) { //nolint
