@@ -170,7 +170,7 @@ func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields cruder.Field
 			return fmt.Errorf("fail query stock: %v", err)
 		}
 
-		if int32(info.InService+info.Locked)+newSold >= int32(info.Total) {
+		if int32(info.InService+info.Locked)+newSold > int32(info.Total) {
 			return fmt.Errorf("stock exhausted")
 		}
 
