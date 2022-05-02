@@ -131,6 +131,22 @@ func TestCRUD(t *testing.T) {
 	schema, err = New(context.Background(), nil)
 	assert.Nil(t, err)
 
+	stock.InService = 1
+	stock.Locked = 0
+
+	info, err = schema.AddFields(context.Background(),
+		uuid.MustParse(info.ID),
+		cruder.NewFields().
+			WithField(constant.StockFieldInService, -1).
+			WithField(constant.StockFieldLocked, -1),
+	)
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, &stock)
+	}
+
+	schema, err = New(context.Background(), nil)
+	assert.Nil(t, err)
+
 	_, err = schema.AddFields(context.Background(),
 		uuid.MustParse(info.ID),
 		cruder.NewFields().

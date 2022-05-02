@@ -187,7 +187,9 @@ func (s *Stock) AddFields(ctx context.Context, id uuid.UUID, fields cruder.Field
 				stm = stm.AddLocked(increment)
 			case constant.StockFieldInService:
 				stm = stm.AddInService(increment)
-				stm = stm.AddSold(increment)
+				if increment > 0 {
+					stm = stm.AddSold(increment)
+				}
 			}
 		}
 
