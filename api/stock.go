@@ -11,13 +11,9 @@ import (
 	crud "github.com/NpoolPlatform/stock-manager/pkg/crud/stock"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-
-	npoolcommon "github.com/NpoolPlatform/message/npool"
 	npool "github.com/NpoolPlatform/message/npool/stockmgr"
 
 	"github.com/google/uuid"
-
-	"google.golang.org/protobuf/types/known/structpb"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -104,7 +100,7 @@ func (s *Server) UpdateStock(ctx context.Context, in *npool.UpdateStockRequest) 
 	}, nil
 }
 
-func stockFieldsToFields(fields map[string]*structpb.Value) (cruder.Fields, error) {
+func stockFieldsToFields(fields cruder.FilterFields) (cruder.Fields, error) {
 	newFields := cruder.NewFields()
 
 	for k, v := range fields {
@@ -198,7 +194,7 @@ func (s *Server) AddStockFields(ctx context.Context, in *npool.AddStockFieldsReq
 	}, nil
 }
 
-func stockCondsToConds(conds map[string]*npoolcommon.FilterCond) (cruder.Conds, error) {
+func stockCondsToConds(conds cruder.FilterConds) (cruder.Conds, error) {
 	newConds := cruder.NewConds()
 
 	for k, v := range conds {
