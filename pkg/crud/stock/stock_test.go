@@ -28,6 +28,9 @@ func init() {
 }
 
 func TestCRUD(t *testing.T) {
+	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
+		return
+	}
 	stock := npool.Stock{
 		GoodID:    uuid.New().String(),
 		Total:     1000,
