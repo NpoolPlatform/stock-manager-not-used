@@ -25,6 +25,9 @@ func init() {
 }
 
 func TestClient(t *testing.T) {
+	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
+		return
+	}
 	_, _ = GetStocks(context.Background(), //nolint
 		cruder.NewFilterConds().
 			WithCond(constant.StockFieldGoodID, cruder.EQ, structpb.NewStringValue(uuid.UUID{}.String())))
