@@ -17,10 +17,11 @@ if ! command -v gofumpt; then
     go install mvdan.cc/gofumpt@latest
 fi
 
+export PATH=$PATH:bin:/tmp/golangci-lint
 if ! command -v golangci-lint; then
+    mkdir -p /tmp/golangci-lint
     curl -sfL $URL | sh -s $VERSION
-    PATH=$PATH:bin
-    cp bin/golangci-lint /usr/bin
+    cp bin/golangci-lint /tmp/golangci-lint
 fi
 
 golangci-lint version
