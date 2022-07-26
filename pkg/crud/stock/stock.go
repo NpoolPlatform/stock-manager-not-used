@@ -33,6 +33,9 @@ func New(ctx context.Context, tx *ent.Tx) (*Stock, error) {
 }
 
 func (s *Stock) rowToObject(row *ent.Stock) *npool.Stock {
+	if row == nil {
+		return nil
+	}
 	return &npool.Stock{
 		ID:        row.ID.String(),
 		GoodID:    row.GoodID.String(),
