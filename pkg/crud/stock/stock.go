@@ -213,6 +213,9 @@ func (s *Stock) Row(ctx context.Context, id uuid.UUID) (*npool.Stock, error) {
 
 	err = db.WithTx(ctx, s.Tx, func(_ctx context.Context) error {
 		info, err = s.Tx.Stock.Query().Where(stock.ID(id)).Only(_ctx)
+		if ent.IsNotFound(err) {
+			return nil
+		}
 		return err
 	})
 	if err != nil {
@@ -343,6 +346,9 @@ func (s *Stock) RowOnly(ctx context.Context, conds cruder.Conds) (*npool.Stock, 
 
 		info, err = stm.Only(_ctx)
 		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil
+			}
 			return fmt.Errorf("fail query stock: %v", err)
 		}
 
