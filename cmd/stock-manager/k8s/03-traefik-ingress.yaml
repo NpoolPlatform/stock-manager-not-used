@@ -48,6 +48,8 @@ spec:
       http: *http_rules
     - host: api.development.npool.top
       http: *http_rules
+    - host: api.api.lpsecretbase.com
+      http: *http_rules
 
 ---
 
@@ -100,4 +102,6 @@ spec:
     - host: api.procyon.xpool.top
       http: *http_rules
     - host: api.development.npool.top
+      http: *http_rules
+    - host: api.api.lpsecretbase.com
       http: *http_rules
